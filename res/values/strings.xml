@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">baiduPanZipViewerV2</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="show_pwd">show pwd</string>
+    <string name="pwd_input_from_title">input pwd</string>
+    <string name="seekbar_start">drag to select</string>
+
+</resources>
