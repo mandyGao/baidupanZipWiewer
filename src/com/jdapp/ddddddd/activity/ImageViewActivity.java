@@ -19,10 +19,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
-import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -45,7 +43,7 @@ import com.sonyericsson.zoom.ImageZoomView;
 import com.sonyericsson.zoom.ZoomState.AlignX;
 import com.sonyericsson.zoom.ZoomState.AlignY;
 
-public class ImageViewActivity extends Activity implements OnClickListener{
+public class ImageViewActivity extends Activity {
 
 	private ZoomMode mZoomMode = ZoomMode.FIT_SCREEN;
 	protected static final String TAG = "ImageBoxActivity";
@@ -54,8 +52,6 @@ public class ImageViewActivity extends Activity implements OnClickListener{
 	private ImageZoomView mZoomView;
 	private Bitmap mBitmap;
 	private ZoomViewOnTouchListener mZoomListener;
-	private Button btnNext;
-	private Button btnPre;
 	private FileInfo fileInfo;
 	private ArrayList<String> imgUrls;
 	private int currentPage;
@@ -73,10 +69,6 @@ public class ImageViewActivity extends Activity implements OnClickListener{
 		progressCircle = (ProgressBar) findViewById(R.id.progress_circle);
 		
 		fileInfo = (FileInfo) this.getIntent().getExtras().getSerializable(App.bundleKeyFileinfo);
-		btnNext = (Button) findViewById(R.id.mbtnNext);
-		btnPre = (Button) findViewById(R.id.mbtnPrev);
-		btnNext.setOnClickListener(this);
-		btnPre.setOnClickListener(this);
 		try {
 			cache = DiskLruCache.open(App.APP_CACHE_DIR, 1, 1, 30 * 1024 * 1024);
 		} catch (IOException e) {
@@ -95,8 +87,23 @@ public class ImageViewActivity extends Activity implements OnClickListener{
 		mZoomControl = new DynamicZoomControl();
 		mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.hehe);
 		mZoomListener = new ZoomViewOnTouchListener(getApplicationContext()){
+		    
 			@Override
-			public boolean onSingleTap() {
+            public void onNextPage() {
+                currentPage++;
+                if (imgUrls.size() <= currentPage) currentPage = imgUrls.size()-1;
+                downloadImgData(currentPage);        
+            }
+
+            @Override
+            public void onPrevPage() {
+                currentPage--;
+                if (0 > currentPage) currentPage = 0;
+                downloadImgData(currentPage);
+            }
+
+            @Override
+			public void onSelectPage() {
 				LayoutInflater inflater = LayoutInflater.from(ImageViewActivity.this);
 				View promptView = inflater.inflate(R.layout.seekbar_dialog, null);
 				final TextView tv1 = (TextView) promptView.findViewById(R.id.seekbar_dialog_tv1);
@@ -137,11 +144,12 @@ public class ImageViewActivity extends Activity implements OnClickListener{
 						})
 				.create()
 				.show();
-				return true;
+				return ;
 			}
 			
 		};
 		mZoomListener.setZoomControl(mZoomControl);
+		mZoomListener.setFlingable(false);
 		
 		mZoomView = (ImageZoomView) findViewById(R.id.mivPage);
 		mZoomView.setZoomState(mZoomControl.getZoomState());
@@ -182,9 +190,10 @@ public class ImageViewActivity extends Activity implements OnClickListener{
 		Log.d(TAG,"ZoomView Height: " + mZoomView.getHeight());
 		Log.d(TAG,"AspectQuotient: " + mZoomView.getAspectQuotient().get());
 
-		mZoomControl.getZoomState().setAlignX(AlignX.Right);
+		//mZoomControl.getZoomState().setAlignX(AlignX.Right);
+		mZoomControl.getZoomState().setAlignX(AlignX.Center);
 		mZoomControl.getZoomState().setAlignY(AlignY.Top);
-		mZoomControl.getZoomState().setPanX(0.0f);
+		mZoomControl.getZoomState().setPanX(0.5f);
 		mZoomControl.getZoomState().setPanY(0.0f);
 		//mZoomControl.getZoomState().setZoom(2f);
 		mZoomControl.getZoomState().setDefaultZoom(computeDefaultZoom(mZoomMode, mZoomView, mBitmap));
@@ -235,26 +244,6 @@ public class ImageViewActivity extends Activity implements OnClickListener{
 		return zoom;
 	}
 
-	/**
-	 * this method implement from OnclickListener
-	 * will handle btn's click event such as next page
-	 */
-	@Override
-	public void onClick(View v) {
-		Log.i(TAG, v.getId()+" onClick");
-		switch(v.getId()){
-		case R.id.mbtnNext:
-			currentPage++;
-			if (imgUrls.size() <= currentPage) currentPage = imgUrls.size()-1;
-			downloadImgData(currentPage);
-			break;
-		case R.id.mbtnPrev:
-			currentPage--;
-			if (0 > currentPage) currentPage = 0;
-			downloadImgData(currentPage);
-			break;
-		}
-	}
 	
 	/**
 	 * 首先检查缓存,没有则添加下载任务
@@ -369,19 +358,7 @@ public class ImageViewActivity extends Activity implements OnClickListener{
 	    Bitmap bitmap = BitmapFactory.decodeStream(is);  
 	    mZoomView.setImage(bitmap); 
 	}
-			 
-	private final void debugHeaders(String TAG, Header[] headers) {
-        if (headers != null) {
-            StringBuilder builder = new StringBuilder();
-            for (Header h : headers) {
-                String _h = String.format("%s : %s", h.getName(), h.getValue());
-                Log.d(TAG, _h);
-                builder.append(_h);
-                builder.append("\n");
-            }
-            Log.d(TAG, "Return Headers:"+builder.toString());
-        }
-    }
+		
 
 
 }

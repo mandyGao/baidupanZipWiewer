@@ -240,6 +240,9 @@ public class ZoomViewOnTouchListener implements OnTouchListener {
 		return false;
 	}
 
+	public void onSelectPage(){
+	    popupMessage(App.CONTEXT, "Select Page");
+	}
 	public void onNextPage() {
 		popupMessage(App.CONTEXT, "Next Page");
 	}
@@ -266,6 +269,9 @@ public class ZoomViewOnTouchListener implements OnTouchListener {
 				case Right:
 					dx = (1 - px) - (1 - px) / factor;
 					break;
+				case Center:
+				    dx = (1 - px) - (1 - px) / factor;
+				    break;
 				default:
 					throw new UnsupportedOperationException("Now just for Right-Top.");
 				}
@@ -306,8 +312,20 @@ public class ZoomViewOnTouchListener implements OnTouchListener {
 
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent e) {
-			Log.v(GESTURE_TAG, "onSingleTapConfirmed()");
-			return onSingleTap();
+		    if (e.getY()<mZoomView.getHeight()*0.3){
+		        Log.v("exp..right",String.format("y:%f  h:%d", e.getY(),mZoomView.getHeight()));
+		        onSelectPage();
+		        return true;
+		    }
+		    if (e.getX()<mZoomView.getWidth()*0.6){
+		        Log.v("exp..left",String.format("x:%f  w:%d", e.getX(),mZoomView.getWidth()));
+		        onNextPage();
+		    }else{
+		        Log.v("exp..left",String.format("x:%f  w:%d", e.getX(),mZoomView.getWidth()));
+		        onPrevPage();
+		    }
+			return true;
+			//return onSingleTap();
 		}
 
 		@Override
@@ -317,7 +335,7 @@ public class ZoomViewOnTouchListener implements OnTouchListener {
 			if (state.getZoom() != state.getDefaultZoom()) {
 				Log.i(GESTURE_TAG, "Double Tap");
 
-				mZoomControl.getZoomState().setPanX(0);
+				mZoomControl.getZoomState().setPanX(0.5f);
 				mZoomControl.getZoomState().setPanY(0);
 				mZoomControl.getZoomState().setZoom(1f);
 				mZoomControl.getZoomState().notifyObservers();
@@ -325,9 +343,9 @@ public class ZoomViewOnTouchListener implements OnTouchListener {
 			} else{
 				Log.i(GESTURE_TAG, "Double Tap");
 
-				mZoomControl.getZoomState().setPanX(0);
+				mZoomControl.getZoomState().setPanX(0.5f);
 				mZoomControl.getZoomState().setPanY(0);
-				mZoomControl.getZoomState().setZoom(1.8f);
+				mZoomControl.getZoomState().setZoom(1.5f);
 				mZoomControl.getZoomState().notifyObservers();
 				return true;
 			}
@@ -343,14 +361,12 @@ public class ZoomViewOnTouchListener implements OnTouchListener {
 
 			if (mFlingable && ((mIsEdgeLeft && scrollX > 0) || (mIsEdgeRight && scrollX < 0))
 					&& Math.abs(velocityX) > mScaledMinimumFlingVelocity
-					&& Math.abs(velocityX) > Math.abs(velocityY) * 2
+					&& Math.abs(velocityX) > Math.abs(velocityY) * 3
 					&& Math.abs(scrollX) > mScaledMinimumFlingDistance) {
 				if (velocityX > 0) {
-					Log.i(GESTURE_TAG, "Next Page");
-					//onNextPage();
+					onNextPage();
 				} else {
-					Log.i(GESTURE_TAG, "Prev Page");
-					//onPrevPage();
+					onPrevPage();
 				}
 
 				//mMode = Mode.NONE;
