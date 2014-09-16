@@ -9,7 +9,7 @@ it's a online comic viewer which play trick with baidupan online unzip api, so i
 
 # how to use?
 
-it have to be working with `http://ddddddd.jd-app.com/comic/howto` as the server side and a web application.
+it have to be working with http://ddddddd.jd-app.com/comic/howto as the server side and a web application.
 
 * follow the introduction from the above link, add zip files and confirm it work.
 * start this app , as this app need cookies to request apis, the app now need a session.properties file to work .
