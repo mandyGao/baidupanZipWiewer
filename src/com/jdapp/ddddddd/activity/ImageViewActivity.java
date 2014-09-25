@@ -68,7 +68,7 @@ public class ImageViewActivity extends Activity {
 		setContentView(R.layout.activity_imageview);
 		progressCircle = (ProgressBar) findViewById(R.id.progress_circle);
 		
-		fileInfo = (FileInfo) this.getIntent().getExtras().getSerializable(App.bundleKeyFileinfo);
+		fileInfo = this.getIntent().getExtras().getParcelable(App.bundleKeyFileinfo);
 		try {
 			cache = DiskLruCache.open(App.APP_CACHE_DIR, 1, 1, 30 * 1024 * 1024);
 		} catch (IOException e) {
