@@ -74,7 +74,7 @@ public class MainActivity extends ListActivity {
 				public void onFailure(int statusCode, Header[] headers,
 						Throwable error, String content) {
 					Log.d("onfailure", ""+statusCode+content);
-					Toast.makeText(MainActivity.this, "update failed: is cookie outdate?", Toast.LENGTH_LONG)
+					Toast.makeText(MainActivity.this, "update failed: check network or is cookie outdate?", Toast.LENGTH_LONG)
 					.show();
 				}
 				
