@@ -25,6 +25,7 @@ it have to be working with http://ddddddd.jd-app.com/comic/howto as the server s
 * picture zoom
 * diskLruCache
 * password protect
+* qrcode scan sysnc session from web
 
 # other
 
