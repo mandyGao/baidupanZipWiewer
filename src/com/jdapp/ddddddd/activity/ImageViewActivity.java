@@ -57,7 +57,7 @@ public class ImageViewActivity extends Activity {
     private int currentPage;
     private DiskLruCache cache;
     private ProgressBar progressCircle;
-    private HashMap<String, Snapshot> snapDict;
+    private HashMap<String, Boolean> downloading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,7 +174,7 @@ public class ImageViewActivity extends Activity {
                         resetZoomState();
                     }
                 });
-        snapDict = new HashMap<String, DiskLruCache.Snapshot>();
+        downloading = new HashMap<String, Boolean>();
         loadCurrentPage();
 
     }
@@ -257,28 +257,26 @@ public class ImageViewActivity extends Activity {
     /**
      * 首先检查缓存,没有则添加下载任务
      * 
-     * @param 
+     * @param
      */
     private void loadCurrentPage() {
         int index = pageIndexChecker(currentPage);
         final String downloadUrl = imgUrls.get(index);
-        if (snapDict.get(downloadUrl) != null) {
-            consumeData(snapDict.get(downloadUrl));
-            snapDict.remove(downloadUrl);
-            notifyCurrentIsReady();
-        } else {
-            try {
-                Snapshot snapshot = cache.get(Utils.md5(downloadUrl));
-                if (snapshot != null) {
-                    consumeData(snapshot);
-                    notifyCurrentIsReady();
-                } else {
+        try {
+            Snapshot snapshot = cache.get(Utils.md5(downloadUrl));
+            if (snapshot != null) {
+                consumeData(snapshot);
+                snapshot.close();
+                notifyCurrentIsReady();
+            } else {
+                if (downloading.get(downloadUrl) == null
+                        || downloading.get(downloadUrl) == false)
                     downloadImgData(downloadUrl);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     private void notifyCurrentIsReady() {
@@ -288,29 +286,34 @@ public class ImageViewActivity extends Activity {
     private void loadNextTwoPage() {
         final String l1 = imgUrls.get(pageIndexChecker(currentPage + 1));
         final String l2 = imgUrls.get(pageIndexChecker(currentPage + 2));
-        if (snapDict.get(l1) == null) {
-            prepareData(l1);
-        }
-        if (snapDict.get(l2) == null) {
-            prepareData(l2);
-        }
-
+        prepareData(l1);
+        prepareData(l2);
     }
 
     private void prepareData(String urlKey) {
-        try {
-            Snapshot snapshot = cache.get(Utils.md5(urlKey));
-            if (snapshot != null) {
-                snapDict.put(urlKey, snapshot);
-            } else {
-                downloadImgData(urlKey);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (downloading.get(urlKey) == null){
+            downloadImgData(urlKey);
+            return;
         }
+        if (downloading.get(urlKey) == true)
+            return;
+        if (downloading.get(urlKey) == false){
+            try {
+                Snapshot snapshot = cache.get(Utils.md5(urlKey));
+                if (snapshot == null) {
+                    downloadImgData(urlKey);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
     }
 
     private void consumeData(Snapshot shot) {
+        if (progressCircle.getVisibility() == View.VISIBLE) {
+            progressCircle.setVisibility(View.GONE);
+        }
         InputStream is = shot.getInputStream(0);
         BitmapFactory.Options opts = new BitmapFactory.Options();
         long len = shot.getLength(0);
@@ -332,12 +335,12 @@ public class ImageViewActivity extends Activity {
     }
 
     private void downloadImgData(final String downloadUrl) {
-        Log.d(TAG, "not cached,will download::" + downloadUrl);
         Http.get(this, downloadUrl, new AsyncHttpResponseHandler() {
 
             @Override
             public void onStart() {
                 Log.d(TAG, "start mession: " + getRequestURI());
+                downloading.put(downloadUrl, true);
                 if (imgUrls.get(currentPage).equals(getRequestURI().toString())) {
                     // current page is been loading,show progress circle
                     if (progressCircle.getVisibility() != View.VISIBLE) {
@@ -353,6 +356,7 @@ public class ImageViewActivity extends Activity {
 
             @Override
             public void onFinish() {
+                downloading.put(getRequestURI().toString(), false);
                 if (imgUrls.get(currentPage).equals(getRequestURI().toString())) {
                     if (progressCircle.getVisibility() != View.GONE) {
                         progressCircle.setVisibility(View.GONE);
