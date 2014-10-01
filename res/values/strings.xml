@@ -8,5 +8,6 @@
     <string name="pwd_input_from_title">input pwd</string>
     <string name="seekbar_start">drag to select</string>
     <string name="qrscan">scan qrcode</string>
+    <string name="menu_share">share</string>
 
 </resources>

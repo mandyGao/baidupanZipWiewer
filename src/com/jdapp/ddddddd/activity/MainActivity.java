@@ -20,12 +20,14 @@ import com.jdapp.ddddddd.App;
 import com.jdapp.ddddddd.R;
 import com.jdapp.ddddddd.db.DBHelper;
 import com.jdapp.ddddddd.model.FileInfo;
+import com.jdapp.ddddddd.ui.MyListFragment;
 import com.jdapp.ddddddd.utils.Http;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import android.os.Bundle;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,111 +35,27 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends ListActivity {
+public class MainActivity extends ActionBarActivity {
 
-    private MyArrayAdapter mAdapter;
-    private ArrayList<FileInfo> infoSet;
-    private FileInfo updatebtn;
+//    private MyArrayAdapter mArrayAdapter;
+//    private ArrayList<FileInfo> infoSet;
+//    private FileInfo updatebtn;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        infoSet = getData();
-        mAdapter = new MyArrayAdapter(this, android.R.layout.simple_list_item_1);
-        updatebtn = new FileInfo("path", 0, new ArrayList<String>(), "0",
-                "UPDATE");
-        mAdapter.add(updatebtn);
-        mAdapter.addAllforApi10(infoSet);
-        setListAdapter(mAdapter);
+        setContentView(R.layout.activity_main);
+        MyListFragment fragment = new MyListFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.layout_main, fragment).commit(); 
         LoadSessions();
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        if (0 == position) {
-            if (null == App.sessionApi) {
-                Toast.makeText(this, "read property file failed,check it",
-                        Toast.LENGTH_LONG).show();
-                return;
-            }
-            Http.setCookie(App.sessionApi);
-            Http.get("http://ddddddd.jd-app.com/comic/api/", null,
-                    new AsyncHttpResponseHandler() {
-
-                        @Override
-                        @Deprecated
-                        public void onSuccess(int statusCode, Header[] headers,
-                                String content) {
-                            Log.d("onSuccess", content);
-                            mAdapter.clear();
-                            mAdapter.add(updatebtn);
-                            mAdapter.addAllforApi10(fileInfoFromJson(content));
-                            mAdapter.notifyDataSetChanged();
-                            Toast.makeText(MainActivity.this,
-                                    "update success. ", Toast.LENGTH_LONG)
-                                    .show();
-
-                            DBHelper dbh = new DBHelper(MainActivity.this);
-                            dbh.addOrUpdate(content);
-                        }
-
-                        @Override
-                        @Deprecated
-                        public void onFailure(int statusCode, Header[] headers,
-                                Throwable error, String content) {
-                            Log.d("onfailure", "" + statusCode + content);
-                            Toast.makeText(
-                                    MainActivity.this,
-                                    "update failed: check network or is cookie outdate?",
-                                    Toast.LENGTH_LONG).show();
-                        }
-
-                    });
-
-        } else {
-            // go to ZIP content
-            FileInfo f = mAdapter.getItem(position);
-            Intent intent = new Intent(this, ImageViewActivity.class);
-            intent.putExtra(App.bundleKeyFileinfo, f);
-            startActivity(intent);
-        }
-
-    }
-
-    private ArrayList<FileInfo> getData() {
-        DBHelper dbh = new DBHelper(this);
-        String dataString = dbh.queryForData();
-        return fileInfoFromJson(dataString);
-    }
-
-    private ArrayList<FileInfo> fileInfoFromJson(String json) {
-        ArrayList<FileInfo> dataSet = new ArrayList<FileInfo>();
-        try {
-            JSONArray ja = new JSONArray(json);
-            for (int i = 0; i < ja.length(); i++) {
-                JSONObject job = ja.getJSONObject(i);
-                String path = job.getString("path");
-                int total = job.getInt("total");
-                JSONArray fileNameJa = job.getJSONArray("list");
-                ArrayList<String> list = new ArrayList<String>();
-                for (int j = 0; j < fileNameJa.length(); j++) {
-                    list.add(fileNameJa.getString(j));
-                }
-                String id = job.getString("id");
-                String name = job.getString("name");
-                FileInfo f = new FileInfo(path, total, list, id, name);
-                dataSet.add(f);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return dataSet;
-    }
+ 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.list, menu);
-        return true;
+        getMenuInflater().inflate(R.menu.actionbar, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -204,6 +122,11 @@ public class MainActivity extends ListActivity {
         // else continue with any other code you need in the method
     }
 
+    //#########################################################
+    
+    
+    
+    //###########################################################
     private void qrscan() {
         IntentIntegrator integrator = new IntentIntegrator(MainActivity.this);
         integrator.initiateScan();
