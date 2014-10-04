@@ -6,11 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Properties;
 
 import org.apache.http.Header;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,21 +16,16 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.jdapp.ddddddd.App;
 import com.jdapp.ddddddd.R;
-import com.jdapp.ddddddd.db.DBHelper;
-import com.jdapp.ddddddd.model.FileInfo;
 import com.jdapp.ddddddd.ui.MyListFragment;
 import com.jdapp.ddddddd.utils.Http;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import android.os.Bundle;
-import android.app.ListActivity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
