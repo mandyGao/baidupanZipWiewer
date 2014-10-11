@@ -36,6 +36,7 @@ import com.jdapp.ddddddd.App.ZoomMode;
 import com.jdapp.ddddddd.R;
 import com.jdapp.ddddddd.model.FileInfo;
 import com.jdapp.ddddddd.utils.Http;
+import com.jdapp.ddddddd.utils.ThumbWriter;
 import com.jdapp.ddddddd.utils.Utils;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.sonyericsson.zoom.DynamicZoomControl;
@@ -58,6 +59,7 @@ public class ImageViewActivity extends Activity {
     private DiskLruCache cache;
     private ProgressBar progressCircle;
     private HashMap<String, Boolean> downloading;
+    private boolean needThumb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,7 @@ public class ImageViewActivity extends Activity {
 
         fileInfo = this.getIntent().getExtras()
                 .getParcelable(App.bundleKeyFileinfo);
+        needThumb = this.getIntent().getExtras().getBoolean("NEED_THUMB");
         try {
             cache = DiskLruCache
                     .open(App.APP_CACHE_DIR, 1, 1, 30 * 1024 * 1024);
@@ -323,6 +326,10 @@ public class ImageViewActivity extends Activity {
         }
         Bitmap bitmap = BitmapFactory.decodeStream(is, null, opts);
         mZoomView.setImage(bitmap);
+        if (needThumb){
+            new ThumbWriter(fileInfo.getId()).execute(bitmap);
+            needThumb = false;
+        }
     }
 
     private int pageIndexChecker(int index) {

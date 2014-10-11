@@ -4,6 +4,13 @@
     <!-- 一定要添加上面一行的自定义命名空间，不然就无法通过XML文件实现Action Item的功能 -->
     <!-- 而且需要特别注意上面自定义的命名空间的后缀一定要和item里   alpha:showAsAction 的前缀一致，不然同样是看不到效果的 -->
     <item
+        android:id="@+id/refresh"
+        alpha:showAsAction="ifRoom"
+        android:icon="@drawable/ic_menu_refresh"
+        android:orderInCategory="100"
+        android:title="@string/refresh"/>
+    
+    <item
         android:id="@+id/qrscan"
         alpha:showAsAction="never"
         android:icon="@drawable/ic_launcher"

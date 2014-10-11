@@ -62,6 +62,7 @@ public class App extends Application {
 
 	public static File APP_FILES_DIR;
 	public static File APP_CACHE_DIR;
+	public static File APP_THUMB_DIR;
 	public static File APP_EXTERNAL_FILES_DIR;
 	public static File APP_EXTERNAL_CACHE_DIR;
 
@@ -121,6 +122,10 @@ public class App extends Application {
 
 		APP_FILES_DIR = getFilesDir();
 		APP_CACHE_DIR = getCacheDir();
+		APP_THUMB_DIR = new File(APP_CACHE_DIR, "thumbs");
+		if (!APP_THUMB_DIR.exists()) {
+		    APP_THUMB_DIR.mkdir();
+		}
 		APP_EXTERNAL_FILES_DIR = CONTEXT.getExternalFilesDir(null);
 		APP_EXTERNAL_CACHE_DIR = CONTEXT.getExternalCacheDir();
 		Log.d(TAG, "APP_FILES_DIR:"+APP_FILES_DIR);

@@ -8,6 +8,17 @@
     <string name="pwd_input_from_title">input pwd</string>
     <string name="seekbar_start">drag to select</string>
     <string name="qrscan">scan qrcode</string>
+    <string name="refresh">refresh</string>
     <string name="menu_share">share</string>
+    <string name="thumbnail">thumbnail</string>
+    <!--  use in code            -->
+    <string name="refresh_sucess">refresh succeed! </string>
+    <string name="refresh_fail">refresh failed, pls check you network and cookies</string>
+    <string name="sync_cookie_sucess">sync cookie succeed! </string>
+    <string name="sync_cookie_fail">sync cookie failed :(</string>
+    <string name="sync_cookie_outdate">oops, the qrcode is out of date, refresh a new one</string>
+    <string name="pls_check_network">connect failed, please check your network</string>
+    <string name="property_not_exist">can\'t find property file, pls add it by scan qrcode or add manuly</string>
+    <string name="property_read_failed">oops, can\'t read property file :(</string>
 
 </resources>

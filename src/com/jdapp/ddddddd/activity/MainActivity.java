@@ -16,6 +16,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.jdapp.ddddddd.App;
 import com.jdapp.ddddddd.R;
+import com.jdapp.ddddddd.db.DBHelper;
 import com.jdapp.ddddddd.ui.MyListFragment;
 import com.jdapp.ddddddd.utils.Http;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -29,17 +30,15 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity {
-
-//    private MyArrayAdapter mArrayAdapter;
-//    private ArrayList<FileInfo> infoSet;
-//    private FileInfo updatebtn;
+    MyListFragment fragment;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        MyListFragment fragment = new MyListFragment();
+        fragment = new MyListFragment();
         getSupportFragmentManager().beginTransaction().replace(R.id.layout_main, fragment).commit(); 
         LoadSessions();
+        
     }
 
  
@@ -55,6 +54,46 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (R.id.qrscan == item.getItemId()) {
             qrscan();
+            return true;
+        } else if(R.id.refresh == item.getItemId()) {
+            final CustomThumtailTextAdapter adapter = (CustomThumtailTextAdapter) fragment.getListAdapter();
+            if (null == App.sessionApi) {
+                Toast.makeText(this, getString(R.string.property_read_failed),
+                        Toast.LENGTH_LONG).show();
+                return true;
+            }
+            Http.setCookie(App.sessionApi);
+            Log.d("setcookie", App.sessionApi);
+            Http.get("http://ddddddd.jd-app.com/comic/api/", null,
+                    new AsyncHttpResponseHandler() {
+
+                        @Override
+                        @Deprecated
+                        public void onSuccess(int statusCode, Header[] headers,
+                                String content) {
+                            Log.d("onSuccess", content);
+                            adapter.setFileItems(MyListFragment.fileInfoFromJson(content));
+                            adapter.notifyDataSetChanged();
+                            Toast.makeText(MainActivity.this,
+                                    getString(R.string.refresh_sucess), Toast.LENGTH_LONG)
+                                    .show();
+
+                            DBHelper dbh = new DBHelper(MainActivity.this);
+                            dbh.addOrUpdate(content);
+                        }
+
+                        @Override
+                        @Deprecated
+                        public void onFailure(int statusCode, Header[] headers,
+                                Throwable error, String content) {
+                            Log.d("onfailure", "" + statusCode + content);
+                            Toast.makeText(
+                                    MainActivity.this,
+                                    getString(R.string.refresh_fail),
+                                    Toast.LENGTH_LONG).show();
+                        }
+
+                    });
             return true;
         } else {
             return false;
@@ -83,10 +122,11 @@ public class MainActivity extends ActionBarActivity {
                         
                             try {
                                 saveSessions(content);
-                                Toast.makeText(MainActivity.this, "attach session successed.push UPDATE to see ",
+                                Toast.makeText(MainActivity.this, getString(R.string.sync_cookie_sucess),
                                         Toast.LENGTH_LONG).show();
+                                LoadSessions();
                             } catch (Exception e) {
-                                Toast.makeText(MainActivity.this, "attach session failed :( ",
+                                Toast.makeText(MainActivity.this, getString(R.string.sync_cookie_fail),
                                         Toast.LENGTH_LONG).show();
                             }
                     }
@@ -98,12 +138,11 @@ public class MainActivity extends ActionBarActivity {
                         Log.d("onfailure", "" + statusCode + content);
                         if (statusCode == 404) {
                             Toast.makeText(
-                                    MainActivity.this,
-                                    "failed: the qrcode is outof date(eg.10min),refresh a new one",
+                                    MainActivity.this, getString(R.string.sync_cookie_outdate),
                                     Toast.LENGTH_LONG).show();
                         } else {
                             Toast.makeText(MainActivity.this,
-                                    "failed: check network or cookie ",
+                                    getString(R.string.sync_cookie_fail),
                                     Toast.LENGTH_LONG).show();
                         }
 
@@ -138,12 +177,12 @@ public class MainActivity extends ActionBarActivity {
         } catch (FileNotFoundException e) {
             Toast.makeText(
                     this,
-                    "read property file failed,file not eixts:"
+                    getString(R.string.property_not_exist)
                             + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Toast.makeText(
                     this,
-                    "read property file failed,read err:"
+                    getString(R.string.property_read_failed)
                             + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
         }
     }
