@@ -62,6 +62,7 @@ public class MyListFragment extends ListFragment {
         if (tag != null && (Boolean) tag == false) {
             needThumb = false;
         }
+        adapter.getThumbAvalibledict().clear();
         FileInfo f = (FileInfo) adapter.getItem(position);
         Intent intent = new Intent(getActivity(), ImageViewActivity.class);
         intent.putExtra(App.bundleKeyFileinfo, f);

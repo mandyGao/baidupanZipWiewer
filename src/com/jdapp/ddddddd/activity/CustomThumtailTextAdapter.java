@@ -105,6 +105,10 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
         }
     }
 
+    public HashMap<String, Bitmap> getThumbAvalibledict() {
+        return thumbAvalibledict;
+    }
+
     @Override
     public int getCount() {
         return fileItems.size();
