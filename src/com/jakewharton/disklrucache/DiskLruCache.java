@@ -442,6 +442,19 @@ public final class DiskLruCache implements Closeable {
 
     return new Snapshot(key, entry.sequenceNumber, ins, entry.lengths);
   }
+  /**
+   * check if the key exist
+   * @author foo
+   * @param key
+   * @return
+   * @throws IOException
+   */
+  public synchronized boolean exist(String key) {
+      checkNotClosed();
+      validateKey(key);
+      Entry entry = lruEntries.get(key);
+      return entry != null;
+  }
 
   /**
    * Returns an editor for the entry named {@code key}, or null if another

@@ -1,5 +1,6 @@
 package com.jdapp.ddddddd.activity;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,6 +17,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +53,6 @@ public class ImageViewActivity extends Activity {
 
     private DynamicZoomControl mZoomControl;
     private ImageZoomView mZoomView;
-    private Bitmap mBitmap;
     private ZoomViewOnTouchListener mZoomListener;
     private FileInfo fileInfo;
     private ArrayList<String> imgUrls;
@@ -60,6 +61,8 @@ public class ImageViewActivity extends Activity {
     private ProgressBar progressCircle;
     private HashMap<String, Boolean> downloading;
     private boolean needThumb;
+    private int screenWidth;
+    private int screenHight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +96,6 @@ public class ImageViewActivity extends Activity {
         imgUrls = Utils.getUrls(fileInfo);
 
         mZoomControl = new DynamicZoomControl();
-        mBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.hehe);
         mZoomListener = new ZoomViewOnTouchListener(getApplicationContext()) {
 
             @Override
@@ -167,7 +169,8 @@ public class ImageViewActivity extends Activity {
 
         mZoomView = (ImageZoomView) findViewById(R.id.mivPage);
         mZoomView.setZoomState(mZoomControl.getZoomState());
-        mZoomView.setImage(mBitmap);
+        mZoomView.setImage(BitmapFactory.decodeResource(getResources(),
+                R.drawable.hehe));
         mZoomView.setOnTouchListener(mZoomListener);
         mZoomControl.setAspectQuotient(mZoomView.getAspectQuotient());
         mZoomView.getViewTreeObserver().addOnGlobalLayoutListener(
@@ -178,8 +181,18 @@ public class ImageViewActivity extends Activity {
                     }
                 });
         downloading = new HashMap<String, Boolean>();
-        loadCurrentPage();
+        
 
+    }
+
+    @Override
+    protected void onResume() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        screenWidth = metrics.widthPixels;
+        screenHight = metrics.heightPixels;
+        loadCurrentPage();
+        super.onResume();
     }
 
     @Override
@@ -198,63 +211,12 @@ public class ImageViewActivity extends Activity {
         Log.d(TAG, "ZoomView Height: " + mZoomView.getHeight());
         Log.d(TAG, "AspectQuotient: " + mZoomView.getAspectQuotient().get());
 
-        // mZoomControl.getZoomState().setAlignX(AlignX.Right);
         mZoomControl.getZoomState().setAlignX(AlignX.Center);
         mZoomControl.getZoomState().setAlignY(AlignY.Top);
         mZoomControl.getZoomState().setPanX(0.5f);
         mZoomControl.getZoomState().setPanY(0.0f);
-        // mZoomControl.getZoomState().setZoom(2f);
-        mZoomControl.getZoomState().setDefaultZoom(
-                computeDefaultZoom(mZoomMode, mZoomView, mBitmap));
+        mZoomControl.getZoomState().setDefaultZoom(1f);
         mZoomControl.getZoomState().notifyObservers();
-    }
-
-    private float computeDefaultZoom(ZoomMode mode, ImageZoomView view,
-            Bitmap bitmap) {
-        if (view.getAspectQuotient() == null
-                || view.getAspectQuotient().get() == Float.NaN) {
-            return 1f;
-        }
-        if (view == null || view.getWidth() == 0 || view.getHeight() == 0) {
-            return 1f;
-        }
-        if (bitmap == null || bitmap.getWidth() == 0 || bitmap.getHeight() == 0) {
-            return 1f;
-        }
-
-        if (mode == ZoomMode.FIT_SCREEN) {
-            return 1f;
-        }
-
-        // aq = (bW / bH) / (vW / vH)
-        float aq = view.getAspectQuotient().get();
-        float zoom = 1f;
-
-        if (mode == ZoomMode.FIT_WIDTH || mode == ZoomMode.FIT_WIDTH_AUTO_SPLIT) {
-            // Over height
-            if (aq < 1f) {
-                zoom = 1f / aq;
-            } else {
-                zoom = 1f;
-            }
-
-            if (mode == ZoomMode.FIT_WIDTH_AUTO_SPLIT) {
-                if (1f * bitmap.getWidth() / view.getWidth() > 1.5f
-                        && bitmap.getWidth() > bitmap.getHeight()) {
-                    zoom *= (2f + App.WIDTH_AUTO_SPLIT_MARGIN)
-                            / (1f + App.WIDTH_AUTO_SPLIT_MARGIN);
-                }
-            }
-        } else if (mode == ZoomMode.FIT_HEIGHT) {
-            // Over width
-            if (aq > 1f) {
-                zoom = aq;
-            } else {
-                zoom = 1f;
-            }
-        }
-
-        return zoom;
     }
 
     /**
@@ -294,42 +256,47 @@ public class ImageViewActivity extends Activity {
     }
 
     private void prepareData(String urlKey) {
-        if (downloading.get(urlKey) == null){
+        boolean isdownloading = false;
+        if (downloading.get(urlKey)!= null && downloading.get(urlKey) == true)
+            isdownloading = true;
+        if (isdownloading)
+            return;
+        if (!cache.exist(Utils.md5(urlKey))) {
             downloadImgData(urlKey);
-            return;
         }
-        if (downloading.get(urlKey) == true)
-            return;
-        if (downloading.get(urlKey) == false){
-            try {
-                Snapshot snapshot = cache.get(Utils.md5(urlKey));
-                if (snapshot == null) {
-                    downloadImgData(urlKey);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        
+
     }
 
     private void consumeData(Snapshot shot) {
         if (progressCircle.getVisibility() == View.VISIBLE) {
             progressCircle.setVisibility(View.GONE);
         }
-        InputStream is = shot.getInputStream(0);
+        // First decode with inJustDecodeBounds=true to check dimensions
+        BufferedInputStream is = new BufferedInputStream(shot.getInputStream(0));
+        is.mark(0);
         BitmapFactory.Options opts = new BitmapFactory.Options();
-        long len = shot.getLength(0);
-        if (len > 1024 * 1024) {
-            Log.d(TAG, "scaled:" + 2);
-            opts.inSampleSize = 2;
+        opts.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(is, null, opts);
+        // Calculate inSampleSize
+        opts.inSampleSize = calculateInSampleSize(opts,
+                screenWidth, screenHight);
+        // Decode bitmap with inSampleSize set
+        opts.inJustDecodeBounds = false;
+        try {
+            is.reset();
+            Bitmap bitmap = BitmapFactory.decodeStream(is, null, opts);
+            is.close();
+            is = null;
+            mZoomView.setImage(bitmap);
+            if (needThumb) {
+                new ThumbWriter(fileInfo.getId()).execute(bitmap);
+                needThumb = false;
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        Bitmap bitmap = BitmapFactory.decodeStream(is, null, opts);
-        mZoomView.setImage(bitmap);
-        if (needThumb){
-            new ThumbWriter(fileInfo.getId()).execute(bitmap);
-            needThumb = false;
-        }
+        
     }
 
     private int pageIndexChecker(int index) {
@@ -416,11 +383,37 @@ public class ImageViewActivity extends Activity {
 
         });
     }
+
     /**
      * To define the inSampleSize dynamically, you may want to know the image
      * size to take your decision:
      * http://stackoverflow.com/questions/11820266/android
      * -bitmapfactory-decodestream-out-of-memory-with-a-400kb-file-with-2mb-f
      **/
+    private static int calculateInSampleSize(BitmapFactory.Options options,
+            int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and
+            // keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        Log.d("calculateInSampleSize", String.format("SampleSize:%d height:%d width:%d reqHeight:%d reqWidth:%d", 
+                inSampleSize,height,width,reqHeight,reqWidth));
+        return inSampleSize;
+    }
 
 }
