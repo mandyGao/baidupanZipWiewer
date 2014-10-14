@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,14 +29,17 @@ import android.widget.TextView;
 
 public class CustomThumtailTextAdapter extends BaseAdapter {
     
-    private class ThumbnailLoader extends AsyncTask<ImageView, Void, Bitmap> {
-        ImageView view;
+    private class ThumbnailLoader extends AsyncTask<Void, Void, Bitmap> {
+        private final WeakReference<ImageView> imageViewReference;
         String tag;
 
-        @Override
-        protected Bitmap doInBackground(ImageView... params) {
-            view = params[0];
+        public ThumbnailLoader(ImageView view) {
+            imageViewReference = new WeakReference<ImageView>(view);
             tag = (String)view.getTag();
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
             File thrumbFile = new File(App.APP_THUMB_DIR, tag);
             if (!thrumbFile.exists()) return null;
             InputStream in = null;
@@ -59,20 +63,19 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
 
         @Override
         protected void onPostExecute(Bitmap result) {
-            if (result != null) {
-                view.setImageBitmap(result);
-                view.setTag(R.id.TAG_NEED_THUMB, false);
-                thumbAvalibledict.put(tag, result);
-            } else {
-                view.setTag(R.id.TAG_NEED_THUMB, true);
-                thumbAvalibledict.put(tag, defoult);
-                super.onPostExecute(result);
+            if (imageViewReference != null ){
+                final ImageView view = imageViewReference.get();
+                if (view == null) return;
+                if ( result != null) {
+                    view.setImageBitmap(result);
+                    view.setTag(R.id.TAG_NEED_THUMB, false);
+                    thumbAvalibledict.put(tag, result);
+                } else {
+                    view.setTag(R.id.TAG_NEED_THUMB, true);
+                    thumbAvalibledict.put(tag, defoult);
+                }
             }
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
+           
         }
 
     }
@@ -138,7 +141,7 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
         iv.setTag(f.getId());
         Log.d("ThumtailAdapter_getView", position+": "+f.getName()+" tag:"+(String)iv.getTag());
         if (thumbAvalibledict.get(f.getId()) == null)
-            new ThumbnailLoader().execute(iv);
+            new ThumbnailLoader(iv).execute();
         else {
             iv.setImageBitmap(thumbAvalibledict.get(f.getId()));
             if (thumbAvalibledict.get(f.getId()).equals(defoult)){

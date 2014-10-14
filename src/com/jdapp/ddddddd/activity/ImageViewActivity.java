@@ -2,7 +2,6 @@ package com.jdapp.ddddddd.activity;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -34,7 +34,6 @@ import com.jakewharton.disklrucache.DiskLruCache;
 import com.jakewharton.disklrucache.DiskLruCache.Editor;
 import com.jakewharton.disklrucache.DiskLruCache.Snapshot;
 import com.jdapp.ddddddd.App;
-import com.jdapp.ddddddd.App.ZoomMode;
 import com.jdapp.ddddddd.R;
 import com.jdapp.ddddddd.model.FileInfo;
 import com.jdapp.ddddddd.utils.Http;
@@ -48,13 +47,11 @@ import com.sonyericsson.zoom.ZoomState.AlignY;
 
 public class ImageViewActivity extends Activity {
 
-    private ZoomMode mZoomMode = ZoomMode.FIT_SCREEN;
     protected static final String TAG = "ImageBoxActivity";
 
     private DynamicZoomControl mZoomControl;
     private ImageZoomView mZoomView;
     private ZoomViewOnTouchListener mZoomListener;
-    private FileInfo fileInfo;
     private ArrayList<String> imgUrls;
     private int currentPage;
     private DiskLruCache cache;
@@ -63,6 +60,8 @@ public class ImageViewActivity extends Activity {
     private boolean needThumb;
     private int screenWidth;
     private int screenHight;
+    private String fileId;
+    private String FileName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +73,10 @@ public class ImageViewActivity extends Activity {
         setContentView(R.layout.activity_imageview);
         progressCircle = (ProgressBar) findViewById(R.id.progress_circle);
 
-        fileInfo = this.getIntent().getExtras()
+        FileInfo fileInfo = this.getIntent().getExtras()
                 .getParcelable(App.bundleKeyFileinfo);
+        fileId = fileInfo.getId();
+        FileName = fileInfo.getName();
         needThumb = this.getIntent().getExtras().getBoolean("NEED_THUMB");
         try {
             cache = DiskLruCache
@@ -150,7 +151,7 @@ public class ImageViewActivity extends Activity {
                         ImageViewActivity.this);
                 alertDialogBuilder
                         .setView(promptView)
-                        .setTitle(fileInfo.getName())
+                        .setTitle(FileName)
                         .setPositiveButton("OK",
                                 new DialogInterface.OnClickListener() {
                                     @Override
@@ -181,7 +182,6 @@ public class ImageViewActivity extends Activity {
                     }
                 });
         downloading = new HashMap<String, Boolean>();
-        
 
     }
 
@@ -199,11 +199,18 @@ public class ImageViewActivity extends Activity {
     protected void onStop() {
         super.onStop();
         Log.i(TAG, "onStop()");
+    }
+    
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mZoomView.setImage(null);
+        Http.cancelAll(this);
         SharedPreferences cur = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = cur.edit();
-        editor.putInt(fileInfo.getId(), currentPage);
+        editor.putInt(fileId, currentPage);
         editor.commit();
-        Http.cancelAll(this);
     }
 
     private void resetZoomState() {
@@ -227,20 +234,13 @@ public class ImageViewActivity extends Activity {
     private void loadCurrentPage() {
         int index = pageIndexChecker(currentPage);
         final String downloadUrl = imgUrls.get(index);
-        try {
-            Snapshot snapshot = cache.get(Utils.md5(downloadUrl));
-            if (snapshot != null) {
-                consumeData(snapshot);
-                snapshot.close();
-                notifyCurrentIsReady();
+            if (cache.exist(Utils.md5(downloadUrl))) {
+                new loadImageTask().execute(downloadUrl);
             } else {
                 if (downloading.get(downloadUrl) == null
                         || downloading.get(downloadUrl) == false)
                     downloadImgData(downloadUrl);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -265,38 +265,6 @@ public class ImageViewActivity extends Activity {
             downloadImgData(urlKey);
         }
 
-    }
-
-    private void consumeData(Snapshot shot) {
-        if (progressCircle.getVisibility() == View.VISIBLE) {
-            progressCircle.setVisibility(View.GONE);
-        }
-        // First decode with inJustDecodeBounds=true to check dimensions
-        BufferedInputStream is = new BufferedInputStream(shot.getInputStream(0));
-        is.mark(0);
-        BitmapFactory.Options opts = new BitmapFactory.Options();
-        opts.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(is, null, opts);
-        // Calculate inSampleSize
-        opts.inSampleSize = calculateInSampleSize(opts,
-                screenWidth, screenHight);
-        // Decode bitmap with inSampleSize set
-        opts.inJustDecodeBounds = false;
-        try {
-            is.reset();
-            Bitmap bitmap = BitmapFactory.decodeStream(is, null, opts);
-            is.close();
-            is = null;
-            mZoomView.setImage(bitmap);
-            if (needThumb) {
-                new ThumbWriter(fileInfo.getId()).execute(bitmap);
-                needThumb = false;
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
     }
 
     private int pageIndexChecker(int index) {
@@ -369,7 +337,6 @@ public class ImageViewActivity extends Activity {
                     response = responseBody == null ? "" : new String(
                             responseBody, getCharset());
                 } catch (UnsupportedEncodingException e) {
-                    // TODO Auto-generated catch block
                     response = "";
                 }
                 final String curUrl = imgUrls.get(currentPage);
@@ -415,5 +382,105 @@ public class ImageViewActivity extends Activity {
                 inSampleSize,height,width,reqHeight,reqWidth));
         return inSampleSize;
     }
+    
+    //#################async tasks#################################################################
+    
+    class loadImageTask extends AsyncTask<String, Float, Bitmap> {
+        @Override
+        protected void onPreExecute() {
+            if (progressCircle.getVisibility() != View.VISIBLE){
+                runOnUiThread(new Runnable() {
+                    
+                    @Override
+                    public void run() {
+                        progressCircle.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+            super.onPreExecute();
+        }
+        
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            String key = Utils.md5(params[0]);
+            Snapshot shot = null;
+            try {
+                shot = cache.get(key);
+            } catch (IOException e2) {
+                e2.printStackTrace();
+            }
+            if (shot == null) return null;
+            // First decode with inJustDecodeBounds=true to check dimensions
+            BufferedInputStream is = new BufferedInputStream(shot.getInputStream(0));
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(is, null, opts);
+            shot.close();
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            // Calculate inSampleSize
+            opts.inSampleSize = calculateInSampleSize(opts,
+                    screenWidth, screenHight);
+            // Decode bitmap with inSampleSize set
+            opts.inJustDecodeBounds = false;
+            Snapshot shot2 = null;
+            try {
+                shot2 = cache.get(key);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            if (shot2 == null) return null;
+            BufferedInputStream is2 = new BufferedInputStream(shot2.getInputStream(0));
+            Bitmap bitmap = BitmapFactory.decodeStream(is2, null, opts);
+            shot2.close();
+            try {
+                is2.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bitmap;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            if (result != null) {
+                mZoomView.setImage(result);
+                if (needThumb) {
+                    new ThumbWriter(fileId).execute(result);
+                    needThumb = false;
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "Read File Failed :<", Toast.LENGTH_LONG).show();
+            }
+            if (progressCircle.getVisibility() == View.VISIBLE) {
+                progressCircle.setVisibility(View.GONE);
+            }
+            notifyCurrentIsReady();
+            super.onPostExecute(result);
+        }
+
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 }
