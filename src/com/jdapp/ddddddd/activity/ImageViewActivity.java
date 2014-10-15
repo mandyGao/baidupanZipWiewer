@@ -62,6 +62,7 @@ public class ImageViewActivity extends Activity {
     private int screenHight;
     private String fileId;
     private String FileName;
+    private boolean safememoMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,6 +183,7 @@ public class ImageViewActivity extends Activity {
                     }
                 });
         downloading = new HashMap<String, Boolean>();
+        safememoMode = App.getSharedPreferences().getBoolean(SettingsActivity.KEY_PREF_SAFE_MEMORY, false);
 
     }
 
@@ -235,6 +237,9 @@ public class ImageViewActivity extends Activity {
         int index = pageIndexChecker(currentPage);
         final String downloadUrl = imgUrls.get(index);
             if (cache.exist(Utils.md5(downloadUrl))) {
+                if (safememoMode){
+                    mZoomView.setImage(null);
+                }
                 new loadImageTask().execute(downloadUrl);
             } else {
                 if (downloading.get(downloadUrl) == null

@@ -48,7 +48,7 @@ public class MyListFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         adapter = new CustomThumtailTextAdapter(getActivity(), getData());
         setListAdapter(adapter);
-        setEmptyText("no data now :(");
+        setEmptyText(getString(R.string.list_fragment_emptytext));
         getListView().setSelector(R.drawable.list_row_selector);
     }
 
@@ -62,7 +62,6 @@ public class MyListFragment extends ListFragment {
         if (tag != null && (Boolean) tag == false) {
             needThumb = false;
         }
-        adapter.getThumbAvalibledict().clear();
         FileInfo f = (FileInfo) adapter.getItem(position);
         Intent intent = new Intent(getActivity(), ImageViewActivity.class);
         intent.putExtra(App.bundleKeyFileinfo, f);
@@ -75,6 +74,24 @@ public class MyListFragment extends ListFragment {
             Bundle savedInstanceState) {
         Log.d("MyListFragment", "onCreateView");
         return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onPause() {
+        adapter.getThumbAvalibledict().clear();
+        super.onPause();
+    }
+
+    @Override
+    public void onLowMemory() {
+        // TODO Auto-generated method stub
+        super.onLowMemory();
+    }
+
+    @Override
+    public void onDetach() {
+        // TODO Auto-generated method stub
+        super.onDetach();
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.jdapp.ddddddd.db.DBHelper;
 import com.jdapp.ddddddd.utils.Utils;
 
 import android.os.Bundle;
+import android.preference.Preference;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -20,6 +21,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 /**
  * an activity to prevent viewing accounts without masterkey
@@ -40,6 +42,14 @@ public class StartActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		SharedPreferences pre = App.getSharedPreferences();
+		if (pre != null && !pre.getBoolean(SettingsActivity.KEY_PREF_USE_PASSWORD, true)){
+		    Intent i = new Intent(getApplicationContext(),
+                    MainActivity.class);
+            startActivity(i);
+            finish();
+            return;
+		}
 		if (null == App.key || "".equals(App.key)) {
 			login();
 		}else{
@@ -95,7 +105,6 @@ public class StartActivity extends Activity {
 								Intent i = new Intent(getApplicationContext(),
 										MainActivity.class);
 								startActivity(i);
-								StartActivity.this.finish();
 							} else if ("".equals(hash)) {
 								//the first time running this app
 								String newhash = Utils.md5(Utils.md5(App.salt)+ Utils.md5(et1.getText().toString()));
@@ -105,10 +114,8 @@ public class StartActivity extends Activity {
 								Intent i = new Intent(getApplicationContext(),
 										MainActivity.class);
 								startActivity(i);
-								StartActivity.this.finish();
 							} else {
 								dialog.dismiss();
-								StartActivity.this.finish();
 							}
 
 						} else

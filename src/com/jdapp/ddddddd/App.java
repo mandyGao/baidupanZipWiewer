@@ -119,7 +119,9 @@ public class App extends Application {
 			e.printStackTrace();
 			Log.e(TAG,"Fail to get version code.");
 		}
-
+		
+		PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+		
 		APP_FILES_DIR = getFilesDir();
 		APP_CACHE_DIR = getCacheDir();
 		APP_THUMB_DIR = new File(APP_CACHE_DIR, "thumbs");

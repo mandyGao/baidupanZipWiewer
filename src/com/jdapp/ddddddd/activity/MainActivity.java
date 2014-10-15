@@ -106,7 +106,12 @@ public class MainActivity extends ActionBarActivity {
 
                     });
             return true;
-        } else {
+        } else if (R.id.setting == item.getItemId()) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        else {
             return false;
         }
 

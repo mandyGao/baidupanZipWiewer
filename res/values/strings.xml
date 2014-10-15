@@ -11,6 +11,7 @@
     <string name="refresh">refresh</string>
     <string name="menu_share">share</string>
     <string name="thumbnail">thumbnail</string>
+    <string name="action_bar_settings">Settings</string>
     <!--  use in code            -->
     <string name="refresh_sucess">refresh succeed! </string>
     <string name="refresh_fail">refresh failed, pls check you network and cookies</string>
@@ -20,5 +21,6 @@
     <string name="pls_check_network">connect failed, please check your network</string>
     <string name="property_not_exist">can\'t find property file, pls add it by scan qrcode or add manuly</string>
     <string name="property_read_failed">oops, can\'t read property file :(</string>
+    <string name="list_fragment_emptytext">There is no data right now. </string>
 
 </resources>

@@ -11,7 +11,7 @@
     <string name="refresh">刷新</string>
     <string name="menu_share">分享</string>
     <string name="thumbnail">缩略图</string>
-    
+    <string name="action_bar_settings">设置</string>
     <!--  use in code            -->
     <string name="refresh_sucess">刷新成功 </string>
     <string name="refresh_fail">刷新失败，请检查网络和cookies</string>
