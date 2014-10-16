@@ -71,8 +71,9 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
                     view.setTag(R.id.TAG_NEED_THUMB, false);
                     thumbAvalibledict.put(tag, result);
                 } else {
+                    view.setImageBitmap(defaultImg);
                     view.setTag(R.id.TAG_NEED_THUMB, true);
-                    thumbAvalibledict.put(tag, defoult);
+                    thumbAvalibledict.put(tag, defaultImg);
                 }
             }
            
@@ -85,7 +86,7 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
     LayoutInflater inflater;
     List<FileInfo> fileItems;
     HashMap<String,Bitmap> thumbAvalibledict;
-    Bitmap defoult;
+    Bitmap defaultImg;
 
     public CustomThumtailTextAdapter(Activity activity, List<FileInfo> _fileItems) {
         this.activity = activity;
@@ -94,7 +95,7 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
             this.fileItems.add(f);
         }
         this.thumbAvalibledict = new HashMap<String, Bitmap>();
-        this.defoult = BitmapFactory.decodeResource(activity.getResources(), R.drawable.unknown_image_icon);
+        this.defaultImg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.unknown_image_icon);
     }
     
     public List<FileInfo> getFileItems() {
@@ -144,7 +145,7 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
             new ThumbnailLoader(iv).execute();
         else {
             iv.setImageBitmap(thumbAvalibledict.get(f.getId()));
-            if (thumbAvalibledict.get(f.getId()).equals(defoult)){
+            if (thumbAvalibledict.get(f.getId()).equals(defaultImg)){
                 iv.setTag(R.id.TAG_NEED_THUMB, true);
             } else{
                 iv.setTag(R.id.TAG_NEED_THUMB, false);

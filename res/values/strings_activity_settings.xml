@@ -13,5 +13,6 @@
     
     <string name="pref_title_savememory">savememory mode</string>
     <string name="pref_description_savememory">destroy current bitmap before load a new one, it can prevent OOM when load large Image </string>
-
+    <string name="pref_title_nosampling">keep image raw size</string>
+    <string name="pref_description_nosampling">use for large memroy small screen devece, no sampling leaves high quality images but also high memeory usage, if memory is not enogh, it crashs</string>
 </resources>

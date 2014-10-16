@@ -1,0 +1,21 @@
+<resources>
+
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">综合</string>
+    
+    <string name="pref_title_usepass">启动时密码验证 </string>
+    <string name="pref_description_usepass">使用简单的密码验证，只能防小白不能防高人</string>
+    
+    <string name="pref_title_savememory">节省内存</string>
+    <string name="pref_description_savememory">载入新图片前先销毁前一个图片，能防止OOM，缺点是会有短暂的黑屏</string>
+    
+    <string name="pref_title_nosampling">使用原始图片</string>
+    <string name="pref_description_nosampling">保留图片原始尺寸，占用高内存，用于大内存小屏幕设备</string>
+    
+
+</resources>

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 
@@ -27,6 +26,7 @@ import com.jdapp.ddddddd.R;
 public class SettingsActivity extends PreferenceActivity {
     public static final String KEY_PREF_SAFE_MEMORY = "is_savememory_checkbox";
     public static final String KEY_PREF_USE_PASSWORD = "is_usepass_checkbox";
+    public static final String KEY_PREF_NOSAMPLING = "is_nosampling_checkbox";
     /**
      * Determines whether to always show the simplified settings UI, where
      * settings are presented in a single list. When false, settings are shown
@@ -95,18 +95,6 @@ public class SettingsActivity extends PreferenceActivity {
             loadHeadersFromResource(R.xml.pref_headers, target);
         }
     }
-
-    /**
-     * A preference value change listener that updates the preference's summary
-     * to reflect its new value.
-     */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-           
-            return true;
-        }
-    };
 
 
     /**

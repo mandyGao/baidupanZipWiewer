@@ -63,6 +63,7 @@ public class ImageViewActivity extends Activity {
     private String fileId;
     private String FileName;
     private boolean safememoMode;
+    private boolean noSampling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,6 +103,10 @@ public class ImageViewActivity extends Activity {
 
             @Override
             public void onNextPage() {
+                if (currentPage + 1 >= imgUrls.size()){
+                    Toast.makeText(ImageViewActivity.this, "last page", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 currentPage++;
                 if (imgUrls.size() <= currentPage)
                     currentPage = imgUrls.size() - 1;
@@ -110,6 +115,10 @@ public class ImageViewActivity extends Activity {
 
             @Override
             public void onPrevPage() {
+                if (currentPage - 1 < 0){
+                    Toast.makeText(ImageViewActivity.this, "first page", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 currentPage--;
                 if (0 > currentPage)
                     currentPage = 0;
@@ -158,8 +167,10 @@ public class ImageViewActivity extends Activity {
                                     @Override
                                     public void onClick(DialogInterface dialog,
                                             int which) {
-                                        currentPage = mSeekbar.getProgress();
-                                        loadCurrentPage();
+                                        if (currentPage != mSeekbar.getProgress()){
+                                            currentPage = mSeekbar.getProgress();
+                                            loadCurrentPage();
+                                        }
                                     }
                                 }).create().show();
                 return;
@@ -184,6 +195,7 @@ public class ImageViewActivity extends Activity {
                 });
         downloading = new HashMap<String, Boolean>();
         safememoMode = App.getSharedPreferences().getBoolean(SettingsActivity.KEY_PREF_SAFE_MEMORY, false);
+        noSampling = App.getSharedPreferences().getBoolean(SettingsActivity.KEY_PREF_NOSAMPLING, false);
 
     }
 
@@ -241,7 +253,12 @@ public class ImageViewActivity extends Activity {
                     mZoomView.setImage(null);
                 }
                 new loadImageTask().execute(downloadUrl);
-            } else {
+            } 
+            else if (downloading.get(downloadUrl) != null && downloading.get(downloadUrl) == true ){
+                if (progressCircle.getVisibility() != View.VISIBLE)
+                    progressCircle.setVisibility(View.VISIBLE);
+            }
+            else {
                 if (downloading.get(downloadUrl) == null
                         || downloading.get(downloadUrl) == false)
                     downloadImgData(downloadUrl);
@@ -378,7 +395,7 @@ public class ImageViewActivity extends Activity {
             // keeps both
             // height and width larger than the requested height and width.
             while ((halfHeight / inSampleSize) > reqHeight
-                    && (halfWidth / inSampleSize) > reqWidth) {
+                    || (halfWidth / inSampleSize) > reqWidth) {
                 inSampleSize *= 2;
             }
         }
@@ -427,8 +444,11 @@ public class ImageViewActivity extends Activity {
                 e.printStackTrace();
             }
             // Calculate inSampleSize
-            opts.inSampleSize = calculateInSampleSize(opts,
-                    screenWidth, screenHight);
+            if (noSampling)
+                opts.inSampleSize = 1;
+            else
+                opts.inSampleSize = calculateInSampleSize(opts,
+                        screenWidth, screenHight);
             // Decode bitmap with inSampleSize set
             opts.inJustDecodeBounds = false;
             Snapshot shot2 = null;
