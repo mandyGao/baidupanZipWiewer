@@ -9,6 +9,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.jdapp.ddddddd.App;
 import com.jdapp.ddddddd.R;
@@ -16,6 +17,7 @@ import com.jdapp.ddddddd.model.FileInfo;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -25,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class CustomThumtailTextAdapter extends BaseAdapter {
@@ -69,11 +72,11 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
                 if ( result != null) {
                     view.setImageBitmap(result);
                     view.setTag(R.id.TAG_NEED_THUMB, false);
-                    thumbAvalibledict.put(tag, result);
+                    thumbAvalibleDict.put(tag, result);
                 } else {
                     view.setImageBitmap(defaultImg);
                     view.setTag(R.id.TAG_NEED_THUMB, true);
-                    thumbAvalibledict.put(tag, defaultImg);
+                    thumbAvalibleDict.put(tag, defaultImg);
                 }
             }
            
@@ -85,7 +88,8 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
     Activity activity;
     LayoutInflater inflater;
     List<FileInfo> fileItems;
-    HashMap<String,Bitmap> thumbAvalibledict;
+    Map<String,Bitmap> thumbAvalibleDict;
+    SharedPreferences pref;
     Bitmap defaultImg;
 
     public CustomThumtailTextAdapter(Activity activity, List<FileInfo> _fileItems) {
@@ -94,8 +98,9 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
         for (FileInfo f : _fileItems) {
             this.fileItems.add(f);
         }
-        this.thumbAvalibledict = new HashMap<String, Bitmap>();
+        this.thumbAvalibleDict = new HashMap<String, Bitmap>();
         this.defaultImg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.unknown_image_icon);
+        pref = activity.getSharedPreferences(App.PROGRESS_RECORD_NAME, Context.MODE_PRIVATE);
     }
     
     public List<FileInfo> getFileItems() {
@@ -109,8 +114,8 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
         }
     }
 
-    public HashMap<String, Bitmap> getThumbAvalibledict() {
-        return thumbAvalibledict;
+    public Map<String, Bitmap> getThumbAvalibledict() {
+        return thumbAvalibleDict;
     }
 
     @Override
@@ -137,15 +142,28 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.list_item_icon_text, null);
         final ImageView iv = (ImageView) convertView.findViewById(R.id.thumbnail);
         final TextView title = (TextView) convertView.findViewById(R.id.title);
+        final ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.list_item_progressbar);
+        final TextView progressTxt = (TextView) convertView.findViewById(R.id.list_item_progresstxt);
+        
         FileInfo f = fileItems.get(position);
         title.setText(f.getName());
+        int progress = pref.getInt(f.getId(), 0);
+        progressBar.setMax(f.getList().size()-1);
+        progressBar.setProgress(progress);
+        progressTxt.setText((progress+1) + "/" + (f.getList().size()));
+        
+        if (position % 2 == 1) {
+            convertView.setBackgroundResource(R.drawable.list_row_selector_odd);
+        } else {
+            convertView.setBackgroundResource(R.drawable.list_row_selector);
+        }
         iv.setTag(f.getId());
         Log.d("ThumtailAdapter_getView", position+": "+f.getName()+" tag:"+(String)iv.getTag());
-        if (thumbAvalibledict.get(f.getId()) == null)
+        if (thumbAvalibleDict.get(f.getId()) == null)
             new ThumbnailLoader(iv).execute();
         else {
-            iv.setImageBitmap(thumbAvalibledict.get(f.getId()));
-            if (thumbAvalibledict.get(f.getId()).equals(defaultImg)){
+            iv.setImageBitmap(thumbAvalibleDict.get(f.getId()));
+            if (thumbAvalibleDict.get(f.getId()).equals(defaultImg)){
                 iv.setTag(R.id.TAG_NEED_THUMB, true);
             } else{
                 iv.setTag(R.id.TAG_NEED_THUMB, false);

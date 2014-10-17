@@ -73,6 +73,7 @@ public class App extends Application {
 	public static int MAX_CACHE_IMGS = 400;
 	
 	public static final String salt = "oaodfoieiiw74243988FDGHJ@#$%^&JJJFEYUUINGG";
+	public static final String PROGRESS_RECORD_NAME = "progress_record";
 	public static String key;
 	public static final String bundleKeyFileinfo = "zipfileinfo";
 	public static String sessionApi;

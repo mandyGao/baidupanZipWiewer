@@ -11,6 +11,7 @@ import org.apache.http.Header;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -93,7 +94,7 @@ public class ImageViewActivity extends Activity {
         }
         Http.setCookie(App.sessionBaiduPan);
         // load conf if exist
-        SharedPreferences cur = getPreferences(MODE_PRIVATE);
+        SharedPreferences cur = getSharedPreferences(App.PROGRESS_RECORD_NAME, Context.MODE_PRIVATE);
         //
         currentPage = cur.getInt(fileInfo.getId(), 0);
         imgUrls = Utils.getUrls(fileInfo);
@@ -135,7 +136,7 @@ public class ImageViewActivity extends Activity {
                         .findViewById(R.id.seekbar_dialog_tv1);
                 final SeekBar mSeekbar = (SeekBar) promptView
                         .findViewById(R.id.seekbar_dialog_seekBar1);
-                tv1.setText(currentPage + " / " + (imgUrls.size() - 1));
+                tv1.setText((currentPage + 1) + " / " + (imgUrls.size()));
                 mSeekbar.setMax(imgUrls.size() - 1);
                 mSeekbar.setProgress(currentPage);
                 mSeekbar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -153,7 +154,7 @@ public class ImageViewActivity extends Activity {
                     @Override
                     public void onProgressChanged(SeekBar seekBar,
                             int progress, boolean fromUser) {
-                        tv1.setText(progress + " / " + (imgUrls.size() - 1));
+                        tv1.setText((progress + 1) + " / " + (imgUrls.size()));
 
                     }
                 });
@@ -221,7 +222,7 @@ public class ImageViewActivity extends Activity {
         super.onPause();
         mZoomView.setImage(null);
         Http.cancelAll(this);
-        SharedPreferences cur = getPreferences(MODE_PRIVATE);
+        SharedPreferences cur = getSharedPreferences(App.PROGRESS_RECORD_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = cur.edit();
         editor.putInt(fileId, currentPage);
         editor.commit();
@@ -305,12 +306,6 @@ public class ImageViewActivity extends Activity {
             public void onStart() {
                 Log.d(TAG, "start mession: " + getRequestURI());
                 downloading.put(downloadUrl, true);
-                if (imgUrls.get(currentPage).equals(getRequestURI().toString())) {
-                    // current page is been loading,show progress circle
-                    if (progressCircle.getVisibility() != View.VISIBLE) {
-                        progressCircle.setVisibility(View.VISIBLE);
-                    }
-                }
             }
 
             @Override
@@ -321,11 +316,6 @@ public class ImageViewActivity extends Activity {
             @Override
             public void onFinish() {
                 downloading.put(getRequestURI().toString(), false);
-                if (imgUrls.get(currentPage).equals(getRequestURI().toString())) {
-                    if (progressCircle.getVisibility() != View.GONE) {
-                        progressCircle.setVisibility(View.GONE);
-                    }
-                }
             }
 
             @Override
@@ -380,8 +370,11 @@ public class ImageViewActivity extends Activity {
      * -bitmapfactory-decodestream-out-of-memory-with-a-400kb-file-with-2mb-f
      **/
     private static int calculateInSampleSize(BitmapFactory.Options options,
-            int reqWidth, int reqHeight) {
+            int _reqWidth, int _reqHeight) {
         // Raw height and width of image
+        int reqWidth = _reqWidth > 768 ? _reqWidth:768;
+        int reqHeight = _reqHeight > 1024 ? _reqHeight:1024;
+        //1024*768*4byte
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
