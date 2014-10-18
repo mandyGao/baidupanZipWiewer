@@ -1,5 +1,6 @@
-package com.jdapp.ddddddd;
+package hotstu.github.bdzviewer;
 
+import hotstu.github.bdzviewer.R;
 import java.io.File;
 
 import android.app.Application;

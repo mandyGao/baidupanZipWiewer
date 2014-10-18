@@ -1,4 +1,4 @@
-package com.jdapp.ddddddd.model;
+package hotstu.github.bdzviewer.model;
 
 import java.util.ArrayList;
 

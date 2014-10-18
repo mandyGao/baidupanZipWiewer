@@ -1,4 +1,4 @@
-package com.jdapp.ddddddd.activity;
+package hotstu.github.bdzviewer;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -34,12 +34,13 @@ import android.widget.Toast;
 import com.jakewharton.disklrucache.DiskLruCache;
 import com.jakewharton.disklrucache.DiskLruCache.Editor;
 import com.jakewharton.disklrucache.DiskLruCache.Snapshot;
-import com.jdapp.ddddddd.App;
-import com.jdapp.ddddddd.R;
-import com.jdapp.ddddddd.model.FileInfo;
-import com.jdapp.ddddddd.utils.Http;
-import com.jdapp.ddddddd.utils.ThumbWriter;
-import com.jdapp.ddddddd.utils.Utils;
+
+import hotstu.github.bdzviewer.R;
+import hotstu.github.bdzviewer.model.FileInfo;
+import hotstu.github.bdzviewer.utils.Http;
+import hotstu.github.bdzviewer.utils.ThumbWriter;
+import hotstu.github.bdzviewer.utils.Utils;
+
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.sonyericsson.zoom.DynamicZoomControl;
 import com.sonyericsson.zoom.ImageZoomView;
@@ -74,8 +75,8 @@ public class ImageViewActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_imageview);
+        
         progressCircle = (ProgressBar) findViewById(R.id.progress_circle);
-
         FileInfo fileInfo = this.getIntent().getExtras()
                 .getParcelable(App.bundleKeyFileinfo);
         fileId = fileInfo.getId();
@@ -94,7 +95,8 @@ public class ImageViewActivity extends Activity {
         }
         Http.setCookie(App.sessionBaiduPan);
         // load conf if exist
-        SharedPreferences cur = getSharedPreferences(App.PROGRESS_RECORD_NAME, Context.MODE_PRIVATE);
+        SharedPreferences cur = getSharedPreferences(App.PROGRESS_RECORD_NAME,
+                Context.MODE_PRIVATE);
         //
         currentPage = cur.getInt(fileInfo.getId(), 0);
         imgUrls = Utils.getUrls(fileInfo);
@@ -104,8 +106,9 @@ public class ImageViewActivity extends Activity {
 
             @Override
             public void onNextPage() {
-                if (currentPage + 1 >= imgUrls.size()){
-                    Toast.makeText(ImageViewActivity.this, "last page", Toast.LENGTH_SHORT).show();
+                if (currentPage + 1 >= imgUrls.size()) {
+                    Toast.makeText(ImageViewActivity.this, "last page",
+                            Toast.LENGTH_SHORT).show();
                     return;
                 }
                 currentPage++;
@@ -116,8 +119,9 @@ public class ImageViewActivity extends Activity {
 
             @Override
             public void onPrevPage() {
-                if (currentPage - 1 < 0){
-                    Toast.makeText(ImageViewActivity.this, "first page", Toast.LENGTH_SHORT).show();
+                if (currentPage - 1 < 0) {
+                    Toast.makeText(ImageViewActivity.this, "first page",
+                            Toast.LENGTH_SHORT).show();
                     return;
                 }
                 currentPage--;
@@ -168,8 +172,10 @@ public class ImageViewActivity extends Activity {
                                     @Override
                                     public void onClick(DialogInterface dialog,
                                             int which) {
-                                        if (currentPage != mSeekbar.getProgress()){
-                                            currentPage = mSeekbar.getProgress();
+                                        if (currentPage != mSeekbar
+                                                .getProgress()) {
+                                            currentPage = mSeekbar
+                                                    .getProgress();
                                             loadCurrentPage();
                                         }
                                     }
@@ -195,8 +201,10 @@ public class ImageViewActivity extends Activity {
                     }
                 });
         downloading = new HashMap<String, Boolean>();
-        safememoMode = App.getSharedPreferences().getBoolean(SettingsActivity.KEY_PREF_SAFE_MEMORY, false);
-        noSampling = App.getSharedPreferences().getBoolean(SettingsActivity.KEY_PREF_NOSAMPLING, false);
+        safememoMode = App.getSharedPreferences().getBoolean(
+                SettingsActivity.KEY_PREF_SAFE_MEMORY, false);
+        noSampling = App.getSharedPreferences().getBoolean(
+                SettingsActivity.KEY_PREF_NOSAMPLING, false);
 
     }
 
@@ -215,14 +223,14 @@ public class ImageViewActivity extends Activity {
         super.onStop();
         Log.i(TAG, "onStop()");
     }
-    
 
     @Override
     protected void onPause() {
         super.onPause();
         mZoomView.setImage(null);
         Http.cancelAll(this);
-        SharedPreferences cur = getSharedPreferences(App.PROGRESS_RECORD_NAME, Context.MODE_PRIVATE);
+        SharedPreferences cur = getSharedPreferences(App.PROGRESS_RECORD_NAME,
+                Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = cur.edit();
         editor.putInt(fileId, currentPage);
         editor.commit();
@@ -249,22 +257,18 @@ public class ImageViewActivity extends Activity {
     private void loadCurrentPage() {
         int index = pageIndexChecker(currentPage);
         final String downloadUrl = imgUrls.get(index);
-            if (cache.exist(Utils.md5(downloadUrl))) {
-                if (safememoMode){
-                    mZoomView.setImage(null);
-                }
-                new loadImageTask().execute(downloadUrl);
-            } 
-            else if (downloading.get(downloadUrl) != null && downloading.get(downloadUrl) == true ){
-                if (progressCircle.getVisibility() != View.VISIBLE)
-                    progressCircle.setVisibility(View.VISIBLE);
+        if (progressCircle.getVisibility() != View.VISIBLE)
+            progressCircle.setVisibility(View.VISIBLE);
+        if (cache.exist(Utils.md5(downloadUrl))) {
+            if (safememoMode) {
+                mZoomView.setImage(null);
             }
-            else {
-                if (downloading.get(downloadUrl) == null
-                        || downloading.get(downloadUrl) == false)
-                    downloadImgData(downloadUrl);
-            }
-
+            new loadImageTask().execute(downloadUrl);
+        } 
+        else if (downloading.get(downloadUrl) == null
+                || downloading.get(downloadUrl) == false) {
+            downloadImgData(downloadUrl);
+        }
     }
 
     private void notifyCurrentIsReady() {
@@ -280,7 +284,7 @@ public class ImageViewActivity extends Activity {
 
     private void prepareData(String urlKey) {
         boolean isdownloading = false;
-        if (downloading.get(urlKey)!= null && downloading.get(urlKey) == true)
+        if (downloading.get(urlKey) != null && downloading.get(urlKey) == true)
             isdownloading = true;
         if (isdownloading)
             return;
@@ -372,9 +376,9 @@ public class ImageViewActivity extends Activity {
     private static int calculateInSampleSize(BitmapFactory.Options options,
             int _reqWidth, int _reqHeight) {
         // Raw height and width of image
-        int reqWidth = _reqWidth > 768 ? _reqWidth:768;
-        int reqHeight = _reqHeight > 1024 ? _reqHeight:1024;
-        //1024*768*4byte
+        int reqWidth = _reqWidth > 768 ? _reqWidth : 768;
+        int reqHeight = _reqHeight > 1024 ? _reqHeight : 1024;
+        // 1024*768*4byte
         final int height = options.outHeight;
         final int width = options.outWidth;
         int inSampleSize = 1;
@@ -393,19 +397,21 @@ public class ImageViewActivity extends Activity {
             }
         }
 
-        Log.d("calculateInSampleSize", String.format("SampleSize:%d height:%d width:%d reqHeight:%d reqWidth:%d", 
-                inSampleSize,height,width,reqHeight,reqWidth));
+        Log.d("calculateInSampleSize", String.format(
+                "SampleSize:%d height:%d width:%d reqHeight:%d reqWidth:%d",
+                inSampleSize, height, width, reqHeight, reqWidth));
         return inSampleSize;
     }
-    
-    //#################async tasks#################################################################
-    
+
+    // #################async
+    // tasks#################################################################
+
     class loadImageTask extends AsyncTask<String, Float, Bitmap> {
         @Override
         protected void onPreExecute() {
-            if (progressCircle.getVisibility() != View.VISIBLE){
+            if (progressCircle.getVisibility() != View.VISIBLE) {
                 runOnUiThread(new Runnable() {
-                    
+
                     @Override
                     public void run() {
                         progressCircle.setVisibility(View.VISIBLE);
@@ -414,7 +420,7 @@ public class ImageViewActivity extends Activity {
             }
             super.onPreExecute();
         }
-        
+
         @Override
         protected Bitmap doInBackground(String... params) {
             String key = Utils.md5(params[0]);
@@ -424,9 +430,11 @@ public class ImageViewActivity extends Activity {
             } catch (IOException e2) {
                 e2.printStackTrace();
             }
-            if (shot == null) return null;
+            if (shot == null)
+                return null;
             // First decode with inJustDecodeBounds=true to check dimensions
-            BufferedInputStream is = new BufferedInputStream(shot.getInputStream(0));
+            BufferedInputStream is = new BufferedInputStream(
+                    shot.getInputStream(0));
             BitmapFactory.Options opts = new BitmapFactory.Options();
             opts.inJustDecodeBounds = true;
             BitmapFactory.decodeStream(is, null, opts);
@@ -440,8 +448,8 @@ public class ImageViewActivity extends Activity {
             if (noSampling)
                 opts.inSampleSize = 1;
             else
-                opts.inSampleSize = calculateInSampleSize(opts,
-                        screenWidth, screenHight);
+                opts.inSampleSize = calculateInSampleSize(opts, screenWidth,
+                        screenHight);
             // Decode bitmap with inSampleSize set
             opts.inJustDecodeBounds = false;
             Snapshot shot2 = null;
@@ -450,8 +458,10 @@ public class ImageViewActivity extends Activity {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-            if (shot2 == null) return null;
-            BufferedInputStream is2 = new BufferedInputStream(shot2.getInputStream(0));
+            if (shot2 == null)
+                return null;
+            BufferedInputStream is2 = new BufferedInputStream(
+                    shot2.getInputStream(0));
             Bitmap bitmap = BitmapFactory.decodeStream(is2, null, opts);
             shot2.close();
             try {
@@ -471,7 +481,8 @@ public class ImageViewActivity extends Activity {
                     needThumb = false;
                 }
             } else {
-                Toast.makeText(getApplicationContext(), "Read File Failed :<", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Read File Failed :<",
+                        Toast.LENGTH_LONG).show();
             }
             if (progressCircle.getVisibility() == View.VISIBLE) {
                 progressCircle.setVisibility(View.GONE);
@@ -481,24 +492,5 @@ public class ImageViewActivity extends Activity {
         }
 
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 }

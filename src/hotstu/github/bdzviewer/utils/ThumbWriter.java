@@ -1,4 +1,6 @@
-package com.jdapp.ddddddd.utils;
+package hotstu.github.bdzviewer.utils;
+
+import hotstu.github.bdzviewer.App;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.jdapp.ddddddd.App;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;

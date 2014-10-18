@@ -1,4 +1,4 @@
-package com.jdapp.ddddddd.activity;
+package hotstu.github.bdzviewer;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.preference.PreferenceFragment;
 
 import java.util.List;
 
-import com.jdapp.ddddddd.R;
+import hotstu.github.bdzviewer.R;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On

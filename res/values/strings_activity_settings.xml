@@ -9,7 +9,7 @@
     <string name="pref_header_general">General</string>
     
     <string name="pref_title_usepass">use password when start </string>
-    <string name="pref_description_usepass">use password when start, it\'s not strong only prevent little white</string>
+    <string name="pref_description_usepass">use password when start, it\'s not strong only prevent little white,!the password first input will be the password!</string>
     
     <string name="pref_title_savememory">savememory mode</string>
     <string name="pref_description_savememory">destroy current bitmap before load a new one, it can prevent OOM when load large Image </string>

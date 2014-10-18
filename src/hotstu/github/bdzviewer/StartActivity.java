@@ -1,9 +1,8 @@
-package com.jdapp.ddddddd.activity;
+package hotstu.github.bdzviewer;
 
-import com.jdapp.ddddddd.App;
-import com.jdapp.ddddddd.R;
-import com.jdapp.ddddddd.db.DBHelper;
-import com.jdapp.ddddddd.utils.Utils;
+import hotstu.github.bdzviewer.R;
+import hotstu.github.bdzviewer.db.DBHelper;
+import hotstu.github.bdzviewer.utils.Utils;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,7 +50,7 @@ public class StartActivity extends Activity {
             @Override
             public void run() {
                 SharedPreferences pre = App.getSharedPreferences();
-                if (pre != null && !pre.getBoolean(SettingsActivity.KEY_PREF_USE_PASSWORD, true)){
+                if (pre != null && !pre.getBoolean(SettingsActivity.KEY_PREF_USE_PASSWORD, false)){
                     Intent i = new Intent(getApplicationContext(),
                             MainActivity.class);
                     startActivity(i);

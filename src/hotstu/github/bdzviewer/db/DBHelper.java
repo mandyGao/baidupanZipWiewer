@@ -1,4 +1,4 @@
-package com.jdapp.ddddddd.db;
+package hotstu.github.bdzviewer.db;
 
 import android.content.ContentValues;
 import android.content.Context;

@@ -21,7 +21,7 @@
     <string name="pls_check_network">connect failed, please check your network</string>
     <string name="property_not_exist">can\'t find property file, pls add it by scan qrcode or add manuly</string>
     <string name="property_read_failed">oops, can\'t read property file :(</string>
-    <string name="list_fragment_emptytext">There is no data right now. </string>
+    <string name="list_fragment_emptytext">There is no data right now. http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/</string>
     <string name="setting_about_description">view pic in baidupan zip</string>
 
 </resources>

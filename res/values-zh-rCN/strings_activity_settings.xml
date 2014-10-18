@@ -9,7 +9,7 @@
     <string name="pref_header_general">综合</string>
     
     <string name="pref_title_usepass">启动时密码验证 </string>
-    <string name="pref_description_usepass">使用简单的密码验证，只能防小白不能防高人</string>
+    <string name="pref_description_usepass">使用简单的密码验证，只能防小白不能防高人，!首次输入的密码将作为下次登陆的密码!</string>
     
     <string name="pref_title_savememory">节省内存</string>
     <string name="pref_description_savememory">载入新图片前先销毁前一个图片，能防止OOM，缺点是会有短暂的黑屏</string>

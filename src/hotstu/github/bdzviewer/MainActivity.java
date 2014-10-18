@@ -1,4 +1,4 @@
-package com.jdapp.ddddddd.activity;
+package hotstu.github.bdzviewer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,11 +14,12 @@ import org.json.JSONObject;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-import com.jdapp.ddddddd.App;
-import com.jdapp.ddddddd.R;
-import com.jdapp.ddddddd.db.DBHelper;
-import com.jdapp.ddddddd.ui.MyListFragment;
-import com.jdapp.ddddddd.utils.Http;
+
+import hotstu.github.bdzviewer.R;
+import hotstu.github.bdzviewer.db.DBHelper;
+import hotstu.github.bdzviewer.ui.MyListFragment;
+import hotstu.github.bdzviewer.utils.Http;
+
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import android.os.Bundle;

@@ -1,4 +1,6 @@
-package com.jdapp.ddddddd.utils;
+package hotstu.github.bdzviewer.utils;
+
+import hotstu.github.bdzviewer.model.FileInfo;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
@@ -8,7 +10,6 @@ import java.util.Iterator;
 
 import android.net.Uri;
 
-import com.jdapp.ddddddd.model.FileInfo;
 
 public class Utils {
 	public static String md5(String string) {

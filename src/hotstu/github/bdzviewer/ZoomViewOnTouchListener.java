@@ -3,7 +3,7 @@
  * http://www.firstdroid.com/2010/06/10/making-sense-of-multitouch/
  */
 
-package com.jdapp.ddddddd.activity;
+package hotstu.github.bdzviewer;
 
 import android.content.Context;
 import android.util.FloatMath;
@@ -19,7 +19,6 @@ import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
 import android.widget.Toast;
 
-import com.jdapp.ddddddd.App;
 import com.sonyericsson.zoom.DynamicZoomControl;
 import com.sonyericsson.zoom.ZoomState;
 

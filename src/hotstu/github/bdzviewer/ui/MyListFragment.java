@@ -1,4 +1,4 @@
-package com.jdapp.ddddddd.ui;
+package hotstu.github.bdzviewer.ui;
 
 import java.util.ArrayList;
 
@@ -6,17 +6,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.jdapp.ddddddd.App;
-import com.jdapp.ddddddd.R;
-import com.jdapp.ddddddd.activity.CustomThumtailTextAdapter;
-import com.jdapp.ddddddd.activity.ImageViewActivity;
-import com.jdapp.ddddddd.db.DBHelper;
-import com.jdapp.ddddddd.model.FileInfo;
+import hotstu.github.bdzviewer.App;
+import hotstu.github.bdzviewer.CustomThumtailTextAdapter;
+import hotstu.github.bdzviewer.ImageViewActivity;
+import hotstu.github.bdzviewer.R;
+import hotstu.github.bdzviewer.db.DBHelper;
+import hotstu.github.bdzviewer.model.FileInfo;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +49,11 @@ public class MyListFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         adapter = new CustomThumtailTextAdapter(getActivity(), getData());
         setListAdapter(adapter);
-        setEmptyText(getString(R.string.list_fragment_emptytext));
+        setEmptyText(Html.fromHtml("<b>There is no data right now. you can</b>"+
+                "<p>sync session by scaning qrcode</p><p>or you can handly create"+
+                " a file: session.properties to the directory:/sdcard/Android/data/hottu.github.bdzviewr/files/</p>"+
+                "<p>for detail:<a href=\" http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/\">"+
+                "http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/</a> </p>"));
         getListView().setSelector(R.drawable.list_row_selector);
     }
 

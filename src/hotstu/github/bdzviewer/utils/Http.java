@@ -1,4 +1,4 @@
-package com.jdapp.ddddddd.utils;
+package hotstu.github.bdzviewer.utils;
 
 import android.content.Context;
 

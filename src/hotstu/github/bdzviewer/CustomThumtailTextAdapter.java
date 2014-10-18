@@ -1,4 +1,4 @@
-package com.jdapp.ddddddd.activity;
+package hotstu.github.bdzviewer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,9 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.jdapp.ddddddd.App;
-import com.jdapp.ddddddd.R;
-import com.jdapp.ddddddd.model.FileInfo;
+import hotstu.github.bdzviewer.R;
+import hotstu.github.bdzviewer.model.FileInfo;
 
 import android.app.Activity;
 import android.content.Context;
