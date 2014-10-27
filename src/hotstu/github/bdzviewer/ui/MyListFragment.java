@@ -1,11 +1,5 @@
 package hotstu.github.bdzviewer.ui;
 
-import java.util.ArrayList;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import hotstu.github.bdzviewer.App;
 import hotstu.github.bdzviewer.CustomThumtailTextAdapter;
 import hotstu.github.bdzviewer.ImageViewActivity;
@@ -13,11 +7,18 @@ import hotstu.github.bdzviewer.R;
 import hotstu.github.bdzviewer.db.DBHelper;
 import hotstu.github.bdzviewer.model.FileInfo;
 
+import java.util.ArrayList;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class MyListFragment extends ListFragment {
 
@@ -48,13 +50,12 @@ public class MyListFragment extends ListFragment {
         Log.d("MyListFragment", "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
         adapter = new CustomThumtailTextAdapter(getActivity(), getData());
+        //getListView().addHeaderView(new View(getActivity()));
+        //getListView().addFooterView(new View(getActivity()));
         setListAdapter(adapter);
-        setEmptyText(Html.fromHtml("<b>There is no data right now. you can</b>"+
-                "<p>sync session by scaning qrcode</p><p>or you can handly create"+
-                " a file: session.properties to the directory:/sdcard/Android/data/hottu.github.bdzviewr/files/</p>"+
-                "<p>for detail:<a href=\" http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/\">"+
-                "http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/</a> </p>"));
-        getListView().setSelector(R.drawable.list_row_selector);
+        setEmptyText(Html.fromHtml(getString(R.string.list_empty)));
+        //getListView().setSelector(R.drawable.list_row_selector);
+        
     }
 
     @Override
@@ -67,7 +68,7 @@ public class MyListFragment extends ListFragment {
         if (tag != null && (Boolean) tag == false) {
             needThumb = false;
         }
-        FileInfo f = (FileInfo) adapter.getItem(position);
+        FileInfo f = (FileInfo) l.getItemAtPosition(position);
         Intent intent = new Intent(getActivity(), ImageViewActivity.class);
         intent.putExtra(App.bundleKeyFileinfo, f);
         intent.putExtra("NEED_THUMB", needThumb);
@@ -78,12 +79,13 @@ public class MyListFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         Log.d("MyListFragment", "onCreateView");
-        return super.onCreateView(inflater, container, savedInstanceState);
+        if (null == inflater)
+            inflater = LayoutInflater.from(getActivity());
+        return inflater.inflate(R.layout.listfragment_content_layout, container, false);
     }
 
     @Override
     public void onPause() {
-        adapter.getThumbAvalibledict().clear();
         super.onPause();
     }
 
@@ -101,7 +103,9 @@ public class MyListFragment extends ListFragment {
 
     @Override
     public void setEmptyText(CharSequence text) {
-        super.setEmptyText(text);
+        TextView emptyTv = (TextView) getView().findViewById(android.R.id.empty);
+        emptyTv.setMovementMethod(LinkMovementMethod.getInstance());
+        emptyTv.setText(text);
     }
 
     @Override

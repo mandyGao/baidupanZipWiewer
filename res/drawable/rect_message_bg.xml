@@ -4,9 +4,13 @@
 
     <gradient
         android:angle="270"
-        android:endColor="@color/list_row_end_color_odd"
+        android:endColor="@color/list_row_start_color_odd"
         android:startColor="@color/list_row_start_color_odd" />
 
     <corners android:radius="10dp" />
+
+    <padding
+        android:left="@dimen/custom_left_margin"
+        android:right="@dimen/custom_right_margin" />
 
 </shape>

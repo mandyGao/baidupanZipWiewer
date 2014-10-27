@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import hotstu.github.bdzviewer.R;
 import hotstu.github.bdzviewer.model.FileInfo;
@@ -67,15 +65,14 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
         protected void onPostExecute(Bitmap result) {
             if (imageViewReference != null ){
                 final ImageView view = imageViewReference.get();
-                if (view == null) return;
+                if (view == null || !tag.equals(view.getTag()) ) return;//view is null or changed
                 if ( result != null) {
                     view.setImageBitmap(result);
                     view.setTag(R.id.TAG_NEED_THUMB, false);
-                    thumbAvalibleDict.put(tag, result);
                 } else {
                     view.setImageBitmap(defaultImg);
                     view.setTag(R.id.TAG_NEED_THUMB, true);
-                    thumbAvalibleDict.put(tag, defaultImg);
+                    //thumbAvalibleDict.put(tag, defaultImg);
                 }
             }
            
@@ -87,7 +84,6 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
     Activity activity;
     LayoutInflater inflater;
     List<FileInfo> fileItems;
-    Map<String,Bitmap> thumbAvalibleDict;
     SharedPreferences pref;
     Bitmap defaultImg;
 
@@ -97,7 +93,6 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
         for (FileInfo f : _fileItems) {
             this.fileItems.add(f);
         }
-        this.thumbAvalibleDict = new HashMap<String, Bitmap>();
         this.defaultImg = BitmapFactory.decodeResource(activity.getResources(), R.drawable.unknown_image_icon);
         pref = activity.getSharedPreferences(App.PROGRESS_RECORD_NAME, Context.MODE_PRIVATE);
     }
@@ -111,10 +106,6 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
         for (FileInfo f : _fileItems) {
             this.fileItems.add(f);
         }
-    }
-
-    public Map<String, Bitmap> getThumbAvalibledict() {
-        return thumbAvalibleDict;
     }
 
     @Override
@@ -158,16 +149,7 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
         }
         iv.setTag(f.getId());
         Log.d("ThumtailAdapter_getView", position+": "+f.getName()+" tag:"+(String)iv.getTag());
-        if (thumbAvalibleDict.get(f.getId()) == null)
-            new ThumbnailLoader(iv).execute();
-        else {
-            iv.setImageBitmap(thumbAvalibleDict.get(f.getId()));
-            if (thumbAvalibleDict.get(f.getId()).equals(defaultImg)){
-                iv.setTag(R.id.TAG_NEED_THUMB, true);
-            } else{
-                iv.setTag(R.id.TAG_NEED_THUMB, false);
-            }
-        }
+        new ThumbnailLoader(iv).execute();
         return convertView;
     }
 
