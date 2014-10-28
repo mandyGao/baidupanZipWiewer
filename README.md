@@ -22,11 +22,20 @@ it have to be working with http://ddddddd.jd-app.com/comic/howto as the server s
 
 # features
 
-* picture zoom
-* diskLruCache
+* picture zoom&drag
+* Cache
 * password protect
 * qrcode scan sysnc session from web
 
-# other
+# Thanks:
+
+ - [JakeWharton / DiskLruCache](https://github.com/JakeWharton/DiskLruCache "JakeWharton / DiskLruCache")
+
+ - [zxing](https://github.com/zxing/zxing "zxing")
+
+ - ImageZoomView
+
+ - [android-async-http](https://github.com/loopj/android-async-http "android-async-http")
+
 
 
