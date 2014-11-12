@@ -1,6 +1,7 @@
 package hotstu.github.bdzviewer.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -15,14 +16,14 @@ public class FileInfo implements Parcelable {
 	 */
     private String path;
     private int total;
-    private ArrayList<String> list;
+    private List<String> list;
     private String id;
     private String name;
 
     public FileInfo() {
     }
 
-    public FileInfo(String path, int total, ArrayList<String> list, String id,
+    public FileInfo(String path, int total, List<String> list, String id,
             String name) {
         this.path = path;
         this.total = total;
@@ -52,11 +53,11 @@ public class FileInfo implements Parcelable {
         this.total = total;
     }
 
-    public ArrayList<String> getList() {
+    public List<String> getList() {
         return list;
     }
 
-    public void setList(ArrayList<String> list) {
+    public void setList(List<String> list) {
         this.list = list;
     }
 

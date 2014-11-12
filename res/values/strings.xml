@@ -12,7 +12,7 @@
     <string name="menu_share">share</string>
     <string name="thumbnail">thumbnail</string>
     <string name="action_bar_settings">Settings</string>
-    <!--  use in code            -->
+    <!-- use in code -->
     <string name="refresh_sucess">refresh succeed! </string>
     <string name="refresh_fail">refresh failed, pls check you network and cookies</string>
     <string name="sync_cookie_sucess">sync cookie succeed! </string>
@@ -23,10 +23,21 @@
     <string name="property_read_failed">oops, can\'t read property file :(</string>
     <string name="list_fragment_emptytext">There is no data right now. http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/</string>
     <string name="setting_about_description">view pic in baidupan zip</string>
-    <string name="list_empty"><![CDATA[<b>There is no data right now. 
+    <string name="list_empty">
+<![CDATA[<b>There is no data right now. 
         you can</b><p>sync session by scaning qrcode</p>
         <p>or you can handly create a file: session.properties to the directory:/sdcard/Android/data/hottu.github.bdzviewr/files/</p>
         <p>for detail:<a href=\"http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/\">http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/</a> </p>]]>
-        </string>
+    </string>
+
+    <!-- login activity -->
+    <string name="login_username">Username</string>
+    <string name="login_password">Password</string>
+    <string name="login_button">Login</string>
+    <string name="login_philosophy">        Do one thing and do it well.</string>
+    <string name="title_activity_login">登录度娘</string>
+    
+    <!-- FileViewerActivity -->
+    <string name="title_activity_fileviewer">我的du盘</string>
 
 </resources>

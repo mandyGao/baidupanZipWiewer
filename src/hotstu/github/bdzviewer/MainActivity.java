@@ -1,45 +1,48 @@
 package hotstu.github.bdzviewer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Properties;
+import hotstu.github.bdzviewer.ui.FileinfoListFragment;
+import hotstu.github.bdzviewer.ui.ProfileFragment;
+import hotstu.github.bdzviewer.utils.Http;
+import hotstu.github.bdzviewer.utils.Utils;
 
 import org.apache.http.Header;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
-
-import hotstu.github.bdzviewer.R;
-import hotstu.github.bdzviewer.db.DBHelper;
-import hotstu.github.bdzviewer.ui.MyListFragment;
-import hotstu.github.bdzviewer.utils.Http;
-
-import com.loopj.android.http.AsyncHttpResponseHandler;
-
-import android.os.Bundle;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+
 public class MainActivity extends ActionBarActivity {
-    MyListFragment fragment;
+    private FileinfoListFragment fragment;
+    private SlidingMenu menu;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        fragment = new MyListFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.layout_main, fragment).commit(); 
-        LoadSessions();
+        fragment = new FileinfoListFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.layout_main, fragment).commit();
         
+        menu = new SlidingMenu(this);
+        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+        menu.setShadowWidthRes(R.dimen.shadow_width);
+        menu.setShadowDrawable(R.drawable.shadow);
+        menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        menu.setFadeDegree(0.35f);
+        menu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        menu.setMenu(R.layout.sliding_menu);
+        getSupportFragmentManager()
+        .beginTransaction()
+        .replace(R.id.menu_content, new ProfileFragment())
+        .commit();
+                
     }
 
  
@@ -47,10 +50,6 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        final CustomThumtailTextAdapter adapter = (CustomThumtailTextAdapter) fragment.getListAdapter();
-        if (adapter != null){
-            adapter.notifyDataSetChanged();
-        }
     }
 
 
@@ -67,47 +66,49 @@ public class MainActivity extends ActionBarActivity {
         if (R.id.qrscan == item.getItemId()) {
             qrscan();
             return true;
-        } else if(R.id.refresh == item.getItemId()) {
-            final CustomThumtailTextAdapter adapter = (CustomThumtailTextAdapter) fragment.getListAdapter();
-            if (null == App.sessionApi) {
-                Toast.makeText(this, getString(R.string.property_read_failed),
-                        Toast.LENGTH_LONG).show();
-                return true;
-            }
-            Http.setCookie(App.sessionApi);
-            Log.d("setcookie", App.sessionApi);
-            Http.get("http://ddddddd.jd-app.com/comic/api/", null,
-                    new AsyncHttpResponseHandler() {
-
-                        @Override
-                        @Deprecated
-                        public void onSuccess(int statusCode, Header[] headers,
-                                String content) {
-                            Log.d("onSuccess", content);
-                            adapter.setFileItems(MyListFragment.fileInfoFromJson(content));
-                            adapter.notifyDataSetChanged();
-                            Toast.makeText(MainActivity.this,
-                                    getString(R.string.refresh_sucess), Toast.LENGTH_LONG)
-                                    .show();
-
-                            DBHelper dbh = new DBHelper(MainActivity.this);
-                            dbh.addOrUpdate(content);
-                        }
-
-                        @Override
-                        @Deprecated
-                        public void onFailure(int statusCode, Header[] headers,
-                                Throwable error, String content) {
-                            Log.d("onfailure", "" + statusCode + content);
-                            Toast.makeText(
-                                    MainActivity.this,
-                                    getString(R.string.refresh_fail),
-                                    Toast.LENGTH_LONG).show();
-                        }
-
-                    });
-            return true;
-        } else if (R.id.setting == item.getItemId()) {
+        } 
+//        else if(R.id.refresh == item.getItemId()) {
+//            final ThumbnailTextAdapter adapter = (ThumbnailTextAdapter) fragment.getListAdapter();
+//            if (null == App.sessionApi) {
+//                Toast.makeText(this, getString(R.string.property_read_failed),
+//                        Toast.LENGTH_LONG).show();
+//                return true;
+//            }
+//            Http.setCookie(App.sessionApi);
+//            Log.d("setcookie", App.sessionApi);
+//            Http.get("http://ddddddd.jd-app.com/comic/api/", null,
+//                    new AsyncHttpResponseHandler() {
+//
+//                        @Override
+//                        @Deprecated
+//                        public void onSuccess(int statusCode, Header[] headers,
+//                                String content) {
+//                            Log.d("onSuccess", content);
+//                            adapter.setFileItems(MyListFragment.fileInfoFromJson(content));
+//                            adapter.notifyDataSetChanged();
+//                            Toast.makeText(MainActivity.this,
+//                                    getString(R.string.refresh_sucess), Toast.LENGTH_LONG)
+//                                    .show();
+//
+//                            //DBHelper dbh = new DBHelper(MainActivity.this);
+//                            //dbh.addOrUpdate(content);
+//                        }
+//
+//                        @Override
+//                        @Deprecated
+//                        public void onFailure(int statusCode, Header[] headers,
+//                                Throwable error, String content) {
+//                            Log.d("onfailure", "" + statusCode + content);
+//                            Toast.makeText(
+//                                    MainActivity.this,
+//                                    getString(R.string.refresh_fail),
+//                                    Toast.LENGTH_LONG).show();
+//                        }
+//
+//                    });
+//            return true;
+//        } 
+        else if (R.id.setting == item.getItemId()) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
@@ -138,10 +139,10 @@ public class MainActivity extends ActionBarActivity {
                             String content) {
                         
                             try {
-                                saveSessions(content);
+                                Utils.saveSessions(content);
                                 Toast.makeText(MainActivity.this, getString(R.string.sync_cookie_sucess),
                                         Toast.LENGTH_LONG).show();
-                                LoadSessions();
+                                Utils.LoadSessions(MainActivity.this);
                             } catch (Exception e) {
                                 Toast.makeText(MainActivity.this, getString(R.string.sync_cookie_fail),
                                         Toast.LENGTH_LONG).show();
@@ -182,38 +183,5 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    private void LoadSessions() {
-        Properties properties = new Properties();
-        File file = new File(App.APP_EXTERNAL_FILES_DIR, "session.properties");
-        try {
-            FileInputStream fis = new FileInputStream(file);
-            properties.load(fis);
-            fis.close();
-            App.sessionApi = properties.getProperty("api");
-            App.sessionBaiduPan = properties.getProperty("baidu");
-        } catch (FileNotFoundException e) {
-            Toast.makeText(
-                    this,
-                    getString(R.string.property_not_exist)
-                            + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
-        } catch (IOException e) {
-            Toast.makeText(
-                    this,
-                    getString(R.string.property_read_failed)
-                            + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void saveSessions(String json) throws JSONException, IOException {
-        JSONObject jo = new JSONObject(json);
-        File file = new File(App.APP_EXTERNAL_FILES_DIR, "session.properties");
-        OutputStream fos;
-        fos = new FileOutputStream(file);
-        Properties properties = new Properties();
-        properties.setProperty("api", jo.getString("sessionid"));
-        properties.setProperty("baidu", jo.getString("bdcookie"));
-        properties.store(fos, null);
-
-    }
 
 }

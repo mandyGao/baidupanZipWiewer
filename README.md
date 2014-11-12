@@ -1,24 +1,20 @@
 baidupanZipWiewer
 =================
+用百度网盘在线浏览漫画
 
-online explore pics inside of zips in baidupan
 
-# what is it?
+# v2.1更新
 
-it's a online comic viewer which play trick with baidupan online unzip api, so it can view comic or other picture zip files stored in baidupan
 
-# how to use?
+* 实现了app端直接登陆百度账号
+* 内置实现了app端浏览百度网盘文件
+* 实现了直接从app端解析zip文件
+* 摆脱了对服务器端http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/的依赖（保留了二维码同步百度session的功能）
+* 代码重构
+* bug消除
+* UI美化
+* 使用中文
 
-it have to be working with http://ddddddd.jd-app.com/comic/howto as the server side and a web application.
-
-* follow the introduction from the above link, add zip files and confirm it work.
-* start this app , as this app need cookies to request apis, the app now need a session.properties file to work .
-* edit a file,it content should be link this:
-
-        api=replace me with cookie from  http://ddddddd.jd-app.com/comic/
-        baidu=replace me with cookie from http://pan.baidu.com/disk/home(need login)
-    
-* the name must be "session.properties", push it in `/sdcard/Android/data/com.jdapp.ddddddd/files/`
 
 # features
 
@@ -29,6 +25,14 @@ it have to be working with http://ddddddd.jd-app.com/comic/howto as the server s
 
 # Thanks:
 
+ - [SlidingMenu](https://github.com/jfeinstein10/SlidingMenu "SlidingMenu") 侧滑栏
+ 
+ - [jsoup](http://jsoup.org/ "jsoup") 用于解析百度登陆页面
+ 
+ - Gson google出品的json 解析库，调用百度网盘api大量使用
+ 
+ - [okhttp](https://github.com/square/okhttp "okhttp") 
+ 
  - [JakeWharton / DiskLruCache](https://github.com/JakeWharton/DiskLruCache "JakeWharton / DiskLruCache")
 
  - [zxing](https://github.com/zxing/zxing "zxing")
@@ -37,5 +41,5 @@ it have to be working with http://ddddddd.jd-app.com/comic/howto as the server s
 
  - [android-async-http](https://github.com/loopj/android-async-http "android-async-http")
 
-
+ 
 

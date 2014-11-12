@@ -1,7 +1,7 @@
 package hotstu.github.bdzviewer;
 
 import hotstu.github.bdzviewer.R;
-import hotstu.github.bdzviewer.db.DBHelper;
+import hotstu.github.bdzviewer.db.UserinfoDAO;
 import hotstu.github.bdzviewer.utils.Utils;
 
 import android.os.Bundle;
@@ -29,7 +29,7 @@ import android.content.SharedPreferences;
  * @author foo
  *
  */
-public class StartActivity extends Activity {
+public class SplashActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class StartActivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-		setContentView(R.layout.activity_login);
+		setContentView(R.layout.activity_splash);
 		Log.d("WatchdogActivity", "onCreate");
 	}
 
@@ -49,6 +49,7 @@ public class StartActivity extends Activity {
             
             @Override
             public void run() {
+                Utils.LoadSessions(getApplicationContext());
                 SharedPreferences pre = App.getSharedPreferences();
                 if (pre != null && !pre.getBoolean(SettingsActivity.KEY_PREF_USE_PASSWORD, false)){
                     Intent i = new Intent(getApplicationContext(),
@@ -100,7 +101,7 @@ public class StartActivity extends Activity {
 					@Override
 					public void onCancel(DialogInterface dialog) {
 						dialog.dismiss();
-						StartActivity.this.finish();
+						SplashActivity.this.finish();
 					}
 				})
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -109,8 +110,9 @@ public class StartActivity extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						if (et1.getText().toString() != null
 								&& !"".equals(et1.getText().toString())) {
-							DBHelper dbh = new DBHelper(StartActivity.this);
-							String hash = dbh.checkPass();
+							//DBHelper dbh = new DBHelper(SplashActivity.this);
+							//String hash = dbh.checkPass();
+						    String hash = UserinfoDAO.checkPass(SplashActivity.this);
 							String input = Utils.md5(Utils.md5(App.salt)+ Utils.md5(et1.getText().toString()));
 							if (!"".equals(hash) && hash.equals(input)) {
 								App.key = et1.getText().toString();
@@ -121,7 +123,8 @@ public class StartActivity extends Activity {
 							} else if ("".equals(hash)) {
 								//the first time running this app
 								String newhash = Utils.md5(Utils.md5(App.salt)+ Utils.md5(et1.getText().toString()));
-								dbh.createPass(newhash);
+								//dbh.createPass(newhash);
+								UserinfoDAO.createPass(SplashActivity.this, newhash);
 								App.key = et1.getText().toString();
 								dialog.dismiss();
 								Intent i = new Intent(getApplicationContext(),
@@ -133,7 +136,7 @@ public class StartActivity extends Activity {
 
 						} else
 							dialog.dismiss();
-							StartActivity.this.finish();
+							SplashActivity.this.finish();
 					}
 
 				})
@@ -144,7 +147,7 @@ public class StartActivity extends Activity {
 							public void onClick(DialogInterface dialog,
 									int which) {
 								dialog.dismiss();
-								StartActivity.this.finish();
+								SplashActivity.this.finish();
 							}
 						});
 		AlertDialog dialog = alertDialogBuilder.create();

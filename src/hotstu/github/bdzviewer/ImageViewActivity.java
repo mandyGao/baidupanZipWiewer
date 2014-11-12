@@ -4,8 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.http.Header;
 
@@ -54,7 +54,7 @@ public class ImageViewActivity extends Activity {
     private DynamicZoomControl mZoomControl;
     private ImageZoomView mZoomView;
     private ZoomViewOnTouchListener mZoomListener;
-    private ArrayList<String> imgUrls;
+    private List<String> imgUrls;
     private int currentPage;
     private DiskLruCache cache;
     private ProgressBar progressCircle;
@@ -478,6 +478,7 @@ public class ImageViewActivity extends Activity {
                 mZoomView.setImage(result);
                 if (needThumb) {
                     new ThumbWriter(fileId).execute(result);
+                    App.mainlistNeedReload = true;
                     needThumb = false;
                 }
             } else {

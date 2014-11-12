@@ -79,6 +79,7 @@ public class App extends Application {
 	public static final String bundleKeyFileinfo = "zipfileinfo";
 	public static String sessionApi;
 	public static String sessionBaiduPan;
+	public static boolean mainlistNeedReload = false;
 
 	public static SharedPreferences getSharedPreferences() {
 		try {

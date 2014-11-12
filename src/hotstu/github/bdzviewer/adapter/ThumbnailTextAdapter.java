@@ -1,14 +1,14 @@
-package hotstu.github.bdzviewer;
+package hotstu.github.bdzviewer.adapter;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import hotstu.github.bdzviewer.App;
 import hotstu.github.bdzviewer.R;
 import hotstu.github.bdzviewer.model.FileInfo;
 
@@ -27,20 +27,20 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class CustomThumtailTextAdapter extends BaseAdapter {
+public class ThumbnailTextAdapter extends BaseAdapter {
     
-    private class ThumbnailLoader extends AsyncTask<Void, Void, Bitmap> {
-        private final WeakReference<ImageView> imageViewReference;
-        String tag;
+    private class ThumbnailLoader extends AsyncTask<String, Void, Bitmap> {
+        private int positon;
+        private ViewHolder holder;
 
-        public ThumbnailLoader(ImageView view) {
-            imageViewReference = new WeakReference<ImageView>(view);
-            tag = (String)view.getTag();
+        public ThumbnailLoader(int position, ViewHolder holder) {
+            this.positon = position;
+            this.holder = holder;
         }
 
         @Override
-        protected Bitmap doInBackground(Void... params) {
-            File thrumbFile = new File(App.APP_THUMB_DIR, tag);
+        protected Bitmap doInBackground(String... params) {
+            File thrumbFile = new File(App.APP_THUMB_DIR, params[0]);
             if (!thrumbFile.exists()) return null;
             InputStream in = null;
             Bitmap bitmap = null;
@@ -63,20 +63,17 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
 
         @Override
         protected void onPostExecute(Bitmap result) {
-            if (imageViewReference != null ){
-                final ImageView view = imageViewReference.get();
-                if (view == null || !tag.equals(view.getTag()) ) return;//view is null or changed
+                if (this.positon != holder.position ) return;//positon is changed, that means the view is recycled
                 if ( result != null) {
-                    view.setImageBitmap(result);
-                    view.setTag(R.id.TAG_NEED_THUMB, false);
+                    holder.iv.setImageBitmap(result);
+                    holder.iv.setTag(R.id.TAG_NEED_THUMB, false);
                 } else {
-                    view.setImageBitmap(defaultImg);
-                    view.setTag(R.id.TAG_NEED_THUMB, true);
+                    holder.iv.setImageBitmap(defaultImg);
+                    holder.iv.setTag(R.id.TAG_NEED_THUMB, true);
                     //thumbAvalibleDict.put(tag, defaultImg);
                 }
             }
            
-        }
 
     }
     
@@ -87,7 +84,7 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
     SharedPreferences pref;
     Bitmap defaultImg;
 
-    public CustomThumtailTextAdapter(Activity activity, List<FileInfo> _fileItems) {
+    public ThumbnailTextAdapter(Activity activity, List<FileInfo> _fileItems) {
         this.activity = activity;
         this.fileItems = new ArrayList<FileInfo>();
         for (FileInfo f : _fileItems) {
@@ -99,6 +96,16 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
     
     public List<FileInfo> getFileItems() {
         return fileItems;
+    }
+    
+    public void clear() {
+        fileItems.clear();
+    }
+    
+    public void addAll(List<FileInfo> fs) {
+        for (FileInfo f : fs) {
+            fileItems.add(f);
+        }
     }
 
     public void setFileItems(List<FileInfo> _fileItems) {
@@ -125,32 +132,54 @@ public class CustomThumtailTextAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        //performance-tips-for-androids-listview
+        //http://lucasr.org/2012/04/05/performance-tips-for-androids-listview/
         if (inflater == null)
             inflater = (LayoutInflater) activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (convertView == null)
-            convertView = inflater.inflate(R.layout.list_item_icon_text, null);
-        final ImageView iv = (ImageView) convertView.findViewById(R.id.thumbnail);
-        final TextView title = (TextView) convertView.findViewById(R.id.title);
-        final ProgressBar progressBar = (ProgressBar) convertView.findViewById(R.id.list_item_progressbar);
-        final TextView progressTxt = (TextView) convertView.findViewById(R.id.list_item_progresstxt);
         
+        ViewHolder holder;
+        if (convertView == null) {
+            //convertView = inflater.inflate(R.layout.list_item_icon_text, null);
+            convertView = inflater.inflate(R.layout.list_item_icon_text, parent, false);
+            holder = new ViewHolder();
+            
+            holder.iv = (ImageView) convertView.findViewById(R.id.thumbnail);
+            holder.title = (TextView) convertView.findViewById(R.id.title);
+            holder.progressBar = (ProgressBar) convertView.findViewById(R.id.list_item_progressbar);
+            holder.progressTxt = (TextView) convertView.findViewById(R.id.list_item_progresstxt);
+            
+            convertView.setTag(holder);
+        }
+        else {
+            holder = (ViewHolder) convertView.getTag();
+        }
+            
         FileInfo f = fileItems.get(position);
-        title.setText(f.getName());
         int progress = pref.getInt(f.getId(), 0);
-        progressBar.setMax(f.getList().size()-1);
-        progressBar.setProgress(progress);
-        progressTxt.setText((progress+1) + "/" + (f.getList().size()));
+        int oldPosition = holder.position;
+        holder.position = position;
+        holder.title.setText(f.getName());
+        holder.progressBar.setMax(f.getList().size()-1);
+        holder.progressBar.setProgress(progress);
+        holder.progressTxt.setText((progress+1) + "/" + (f.getList().size()));
         
         if (position % 2 == 1) {
             convertView.setBackgroundResource(R.drawable.list_row_selector_odd);
         } else {
             convertView.setBackgroundResource(R.drawable.list_row_selector);
         }
-        iv.setTag(f.getId());
-        Log.d("ThumtailAdapter_getView", position+": "+f.getName()+" tag:"+(String)iv.getTag());
-        new ThumbnailLoader(iv).execute();
+        Log.d("ThumtailAdapter_getView", String.format("old to current:%d --> %d ",  oldPosition,position));
+        new ThumbnailLoader(position, holder).execute(f.getId());
         return convertView;
+    }
+    
+    private static class ViewHolder {
+        public int position;
+        public ImageView iv;
+        public TextView title;
+        public ProgressBar progressBar;
+        public TextView progressTxt;
     }
 
 }

@@ -7,5 +7,10 @@
     
     <dimen name="custom_left_margin">10dp</dimen>
     <dimen name="custom_right_margin">10dp</dimen>
+    
+    <!-- sliding menu -->
+    <dimen name="slidingmenu_offset">60dp</dimen>
+    <dimen name="list_padding">10dp</dimen>
+    <dimen name="shadow_width">15dp</dimen>
 
 </resources>

@@ -1,19 +1,18 @@
 package hotstu.github.bdzviewer.ui;
 
 import hotstu.github.bdzviewer.App;
-import hotstu.github.bdzviewer.CustomThumtailTextAdapter;
 import hotstu.github.bdzviewer.ImageViewActivity;
 import hotstu.github.bdzviewer.R;
-import hotstu.github.bdzviewer.db.DBHelper;
+import hotstu.github.bdzviewer.adapter.ThumbnailTextAdapter;
+import hotstu.github.bdzviewer.db.ZipfileinfoDAO;
 import hotstu.github.bdzviewer.model.FileInfo;
 
-import java.util.ArrayList;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -23,15 +22,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class MyListFragment extends ListFragment {
+public class FileinfoListFragment extends ListFragment {
 
-    // private MyArrayAdapter mArrayAdapter;
-    private CustomThumtailTextAdapter adapter;
+    private ThumbnailTextAdapter adapter;
 
     @Override
     public void onAttach(Activity activity) {
@@ -49,13 +50,57 @@ public class MyListFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         Log.d("MyListFragment", "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-        adapter = new CustomThumtailTextAdapter(getActivity(), getData());
+        adapter = new ThumbnailTextAdapter(getActivity(), getData());
         //getListView().addHeaderView(new View(getActivity()));
         //getListView().addFooterView(new View(getActivity()));
         setListAdapter(adapter);
         setEmptyText(Html.fromHtml(getString(R.string.list_empty)));
         //getListView().setSelector(R.drawable.list_row_selector);
+        getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+                final FileInfo f = (FileInfo) getListView().getItemAtPosition(position);
+                new AlertDialog.Builder(getActivity())
+                .setMessage("删除:" + f.getName())
+                .setPositiveButton("确认", new OnClickListener() {
+                    
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ZipfileinfoDAO.delete(getActivity(), f);
+                        reload();
+                    }
+                }).setNegativeButton("取消", new OnClickListener() {
+                    
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        
+                    }
+                }).create().show();
+                return false;
+            }
+        });
         
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (App.mainlistNeedReload) {
+            App.mainlistNeedReload = false;
+            reload();
+        }
+    }
+
+    private void reload() {
+        final ThumbnailTextAdapter adapter = (ThumbnailTextAdapter) getListAdapter();
+        if (adapter != null){
+            adapter.clear();
+            adapter.addAll(getData());
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -91,13 +136,11 @@ public class MyListFragment extends ListFragment {
 
     @Override
     public void onLowMemory() {
-        // TODO Auto-generated method stub
         super.onLowMemory();
     }
 
     @Override
     public void onDetach() {
-        // TODO Auto-generated method stub
         super.onDetach();
     }
 
@@ -113,34 +156,11 @@ public class MyListFragment extends ListFragment {
         super.setListAdapter(adapter);
     }
 
-    private ArrayList<FileInfo> getData() {
-        DBHelper dbh = new DBHelper(getActivity());
-        String dataString = dbh.queryForData();
-        return fileInfoFromJson(dataString);
+    private List<FileInfo> getData() {
+//        DBHelper dbh = new DBHelper(getActivity());
+//        String dataString = dbh.queryForData();
+        return ZipfileinfoDAO.getAllFileinfo(getActivity());
     }
 
-    public static ArrayList<FileInfo> fileInfoFromJson(String json) {
-        ArrayList<FileInfo> dataSet = new ArrayList<FileInfo>();
-        try {
-            JSONArray ja = new JSONArray(json);
-            for (int i = 0; i < ja.length(); i++) {
-                JSONObject job = ja.getJSONObject(i);
-                String path = job.getString("path");
-                int total = job.getInt("total");
-                JSONArray fileNameJa = job.getJSONArray("list");
-                ArrayList<String> list = new ArrayList<String>();
-                for (int j = 0; j < fileNameJa.length(); j++) {
-                    list.add(fileNameJa.getString(j));
-                }
-                String id = job.getString("id");
-                String name = job.getString("name");
-                FileInfo f = new FileInfo(path, total, list, id, name);
-                dataSet.add(f);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return dataSet;
-    }
-
+    
 }
