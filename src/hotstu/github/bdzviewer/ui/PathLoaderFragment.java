@@ -37,6 +37,7 @@ public class PathLoaderFragment extends ListFragment implements
                 R.layout.list_item_icon_text);
         setListAdapter(mAdapter);
         setListShown(false);
+        setEmptyText("没有内容，请检查网络连接");
         
         if (savedInstanceState != null && savedInstanceState.getSerializable("stack") != null) {
             mPathStack = (Stack<String>) savedInstanceState.getSerializable("stack");

@@ -1,11 +1,23 @@
 package hotstu.github.bdzviewer.ui;
 
+import java.io.IOException;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
 import hotstu.github.bdzviewer.App;
 import hotstu.github.bdzviewer.FileViewerActivity;
 import hotstu.github.bdzviewer.LoginActivity;
 import hotstu.github.bdzviewer.R;
+import hotstu.github.bdzviewer.utils.HttpUtil;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +31,8 @@ public class ProfileFragment extends Fragment implements OnClickListener {
     private TextView btnLogin;
     private TextView btnFileMange;
     private TextView btnLogout;
+    private String username;
+    private static Handler mHandler = new Handler();
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_myprofile, container, false);
@@ -42,6 +56,66 @@ public class ProfileFragment extends Fragment implements OnClickListener {
         
         return rootView;
     }
+    
+    
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        
+        if (App.sessionBaiduPan == null)
+            return;
+        if( savedInstanceState != null && savedInstanceState.getString("username")!= null){
+            showUsername(savedInstanceState.getString("username"));
+        }
+        
+        else {
+            //
+            new Thread(new Runnable() {
+                
+                @Override
+                public void run() {
+                    OkHttpClient client = HttpUtil.getOkHttpClientinstance();
+                    Request req = new Request.Builder().url("http://passport.baidu.com/center")
+                            .addHeader("Cookie", App.sessionBaiduPan)
+                            .addHeader("User-Agent", HttpUtil.UA_FIREFOX)
+                            .build();
+                    try {
+                        Response resp = client.newCall(req).execute();
+                        String html = resp.body().string();
+                        Document soup = Jsoup.parse(html);
+                        final String name = soup.select("div#displayUsername").text();
+                        mHandler.postDelayed(new Runnable() {
+                            
+                            @Override
+                            public void run() {
+                                showUsername(name);
+                            }
+                        }, 1000);
+                        
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    
+                }
+            }).start();
+            
+        }
+    }
+    
+    
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (username != null) {
+            outState.putString("username", username);
+        }
+    }
+
+   private void showUsername(String username) {
+       this.username = username;
+       btnLogin.setText(username+" - 已登录");
+   }
 
     @Override
     public void onClick(View v) {
@@ -56,11 +130,13 @@ public class ProfileFragment extends Fragment implements OnClickListener {
                 startActivity(intent);
             } else {
                 // plz login first
-                Toast.makeText(getActivity(), "plz login first", Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "请先登陆", Toast.LENGTH_LONG).show();
             }
         }
         else if (v.getId() == btnLogout.getId()){
-            Toast.makeText(getActivity(), "logout clicked", Toast.LENGTH_LONG).show();
+            btnLogin.setText("点击登录");
+            this.username = null;
+            //Toast.makeText(getActivity(), "logout clicked", Toast.LENGTH_LONG).show();
         }
         
     }
