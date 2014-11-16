@@ -9,7 +9,7 @@ baidupanZipWiewer
 * 实现了app端直接登陆百度账号
 * 内置实现了app端浏览百度网盘文件
 * 实现了直接从app端解析zip文件
-* 摆脱了对服务器端http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/的依赖（保留了二维码同步百度session的功能）
+* 摆脱了对服务器端http://ddddddd.jd-app.com/blog/article/baidupanZipWiewer2/ 的依赖（保留了二维码同步百度session的功能）
 * 代码重构
 * bug消除
 * UI美化
