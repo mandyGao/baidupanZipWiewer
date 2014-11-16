@@ -13,6 +13,7 @@ import com.squareup.okhttp.Response;
 public class HttpUtil {
     public static final String UA_FIREFOX = "Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/34.0";
     public static final String UA_NOKIA = "Mozilla/5.0 (Symbian/3; Series60/5.3 Nokia701/111.020.0307; Profile/MIDP-2.1 Configuration/CLDC-1.1 ) AppleWebKit/533.4 (KHTML, like Gecko) NokiaBrowser/7.4.1.14 Mobile Safari/533.4 3gpp-gba";
+    public static final String REFERER_DEFAULT = "http://pan.baidu.com/disk/home";
     private static OkHttpClient client;
     private static CookieManager cm;
 

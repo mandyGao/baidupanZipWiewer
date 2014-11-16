@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/login_username"
+        android:layout_marginTop="20dp"
         android:inputType="text"
         android:paddingTop="15dp"
         android:textSize="20sp" >
@@ -22,6 +23,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/login_password"
         android:inputType="textPassword"
+        android:layout_marginTop="10dp"
         android:paddingTop="10dp"
         android:textSize="20sp" >
     </EditText>

@@ -3,6 +3,7 @@ package hotstu.github.bdzviewer.baiduapi;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +147,7 @@ public class UnzipTask extends AsyncTask<String, String, FileInfo> {
                 }
                 
             }
+            Collections.sort(fileArray);
             return new FileInfo(path, fileArray.size(), fileArray, 
                     String.valueOf(System.currentTimeMillis()), FileUtil.getfileName(path));
              
