@@ -1,7 +1,7 @@
 package hotstu.github.bdzviewer.ui;
 
 import hotstu.github.bdzviewer.App;
-import hotstu.github.bdzviewer.ImageViewActivity;
+import hotstu.github.bdzviewer.MoImageViewActiviy;
 import hotstu.github.bdzviewer.R;
 import hotstu.github.bdzviewer.adapter.ThumbnailTextAdapter;
 import hotstu.github.bdzviewer.db.ZipfileinfoDAO;
@@ -114,7 +114,7 @@ public class FileinfoListFragment extends ListFragment {
             needThumb = false;
         }
         FileInfo f = (FileInfo) l.getItemAtPosition(position);
-        Intent intent = new Intent(getActivity(), ImageViewActivity.class);
+        Intent intent = new Intent(getActivity(), MoImageViewActiviy.class);
         intent.putExtra(App.bundleKeyFileinfo, f);
         intent.putExtra("NEED_THUMB", needThumb);
         startActivity(intent);

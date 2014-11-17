@@ -78,7 +78,6 @@ public class ImageZoomView extends View implements Observer {
 	 */
 	public void setImage(Bitmap bitmap) {
 		if (mBitmap != null && mBitmap != bitmap) {
-			//----被注释掉防止被回收-----
 			mBitmap.recycle();
 		}
 		mBitmap = bitmap;

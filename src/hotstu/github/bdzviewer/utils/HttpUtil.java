@@ -73,7 +73,8 @@ public class HttpUtil {
     public static void debugHeaders(Response resp) {
         Headers headers = resp.headers();
         System.out.println(resp.code());
-
+        
+        System.out.println("########response header###########");
         for (String name : headers.names()) {
             for (String v : headers.values(name)) {
                 System.out.println(String.format("%s : %s", name, v));

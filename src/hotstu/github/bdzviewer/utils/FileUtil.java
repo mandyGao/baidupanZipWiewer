@@ -1,8 +1,31 @@
 package hotstu.github.bdzviewer.utils;
 
+import hotstu.github.bdzviewer.App;
+
+import java.io.IOException;
 import java.util.Locale;
 
+import android.widget.Toast;
+
+import com.jakewharton.disklrucache.DiskLruCache;
+
 public class FileUtil {
+    private static DiskLruCache mDiskLruCache;
+    
+    public static DiskLruCache diskCacheInstance() throws IOException {
+        if (mDiskLruCache == null) {
+            try {
+                mDiskLruCache = DiskLruCache.open(App.APP_EXTERNAL_CACHE_DIR, 1, 1, 30 * 1024 * 1024);
+            } catch (IOException e) {
+                e.printStackTrace();
+                mDiskLruCache = DiskLruCache.open(App.APP_CACHE_DIR, 1, 1, 30 * 1024 * 1024);
+                if (mDiskLruCache == null) {
+                    throw e;
+                }
+            }
+        }
+        return mDiskLruCache;       
+    }
 
     /**
      * 从文件名或文件路径中提取文件后缀

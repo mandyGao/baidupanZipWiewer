@@ -82,6 +82,12 @@ public class ProfileFragment extends Fragment implements OnClickListener {
                             .build();
                     try {
                         Response resp = client.newCall(req).execute();
+                        String header= resp.header("Set-Cookie",null);
+                        if (header != null) {
+                            String bduid = header.split(";")[0].trim();
+                            App.sessionBaiduPan += ("; "+bduid);
+                            System.out.println(App.sessionBaiduPan);
+                        }
                         String html = resp.body().string();
                         Document soup = Jsoup.parse(html);
                         final String name = soup.select("div#displayUsername").text();

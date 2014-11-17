@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Observable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -85,7 +86,7 @@ import java.util.regex.Pattern;
  * Callers should handle other problems by catching {@code IOException} and
  * responding appropriately.
  */
-public final class DiskLruCache implements Closeable {
+public final class DiskLruCache extends Observable implements Closeable {
   static final String JOURNAL_FILE = "journal";
   static final String JOURNAL_FILE_TEMP = "journal.tmp";
   static final String JOURNAL_FILE_BACKUP = "journal.bkp";
@@ -447,7 +448,6 @@ public final class DiskLruCache implements Closeable {
    * @author foo
    * @param key
    * @return
-   * @throws IOException
    */
   public synchronized boolean exist(String key) {
       checkNotClosed();
@@ -560,6 +560,9 @@ public final class DiskLruCache implements Closeable {
     if (entry.readable | success) {
       entry.readable = true;
       journalWriter.write(CLEAN + ' ' + entry.key + entry.getLengths() + '\n');
+      //#########
+      setChanged();
+      //notifyObservers(entry.key);
       if (success) {
         entry.sequenceNumber = nextSequenceNumber++;
       }

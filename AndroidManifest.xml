@@ -33,7 +33,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ImageViewActivity"
+            android:name=".MoImageViewActiviy"
             android:screenOrientation="portrait" >
         </activity>
         <activity
