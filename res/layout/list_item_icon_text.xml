@@ -5,16 +5,18 @@
     android:padding="8dp" >
 
     <!-- Thumbnail Image -->
+
     <ImageView
         android:id="@+id/thumbnail"
-        android:contentDescription="@string/thumbnail"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/unknown_image_icon"
-        android:layout_marginRight="8dp" />
+        android:layout_marginRight="8dp"
+        android:contentDescription="@string/thumbnail"
+        android:src="@drawable/unknown_image_icon" />
 
-    <!--  Title -->
+    <!-- Title -->
+
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
@@ -24,5 +26,20 @@
         android:textSize="@dimen/title"
         android:textStyle="bold" />
 
+    <ProgressBar
+        android:id="@+id/list_item_progressbar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/title"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/list_item_progresstxt" />
+
+    <TextView
+        android:id="@+id/list_item_progresstxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>
