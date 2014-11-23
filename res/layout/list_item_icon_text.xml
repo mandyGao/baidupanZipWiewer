@@ -24,22 +24,5 @@
         android:textSize="@dimen/title"
         android:textStyle="bold" />
 
-    <ProgressBar
-        android:id="@+id/list_item_progressbar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/title"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/list_item_progresstxt"
-         />
-
-    <TextView
-        android:id="@+id/list_item_progresstxt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        />
 
 </RelativeLayout>

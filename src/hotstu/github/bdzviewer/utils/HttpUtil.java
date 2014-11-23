@@ -5,6 +5,7 @@ import java.net.CookieManager;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.OkHttpClient;
@@ -26,6 +27,10 @@ public class HttpUtil {
         if (client == null) {
             client = new OkHttpClient();
         }
+        client.setCookieHandler(null);
+        client.setConnectTimeout(10, TimeUnit.SECONDS);
+        client.setWriteTimeout(10, TimeUnit.SECONDS);
+        client.setReadTimeout(30, TimeUnit.SECONDS);
         return client;
     }
     

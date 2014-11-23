@@ -65,6 +65,7 @@ public class PathLoaderFragment extends ListFragment implements
             Bundle args = new Bundle();
             args.putString("dir", backpath);
             getLoaderManager().restartLoader(0, args, this);
+            curPath = backpath;
             return true;
         }
        
